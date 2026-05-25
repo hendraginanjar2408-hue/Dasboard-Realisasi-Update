@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Realisasi Anggaran — Ditjen P2 Kemkes RI TA 2026</title>
+<title>Dashboard Realisasi Anggaran — Ditjen Penanggulangan Penyakit Kemkes RI TA 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -16,17 +16,14 @@
   --tq-light: #80D4D1;
   --tq-pale:  #E0F5F4;
   --tq-bg:    #F4FAF9;
-
   --gr:       #6CC24A;
   --gr-dark:  #4E9934;
   --gr-mid:   #8FD66E;
   --gr-pale:  #EAF7E4;
-
   --amber:    #D97706;
   --amber-pale:#FEF3C7;
   --red:      #B91C1C;
   --red-pale: #FEE2E2;
-
   --gray-900: #1A1A1A;
   --gray-700: #444444;
   --gray-500: #777777;
@@ -34,7 +31,6 @@
   --gray-100: #F5F5F3;
   --white:    #FFFFFF;
   --border:   #D1EAE8;
-
   --font: 'Plus Jakarta Sans', sans-serif;
   --mono: 'DM Mono', monospace;
   --r:    10px;
@@ -44,19 +40,14 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-size:14px;line-height:1.6;min-height:100vh}
 
-/* TOP BAR - Sedikit penyesuaian tinggi untuk logo baru */
 .topbar{background:var(--white);color:var(--gray-900);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.05);border-bottom:1px solid var(--border)}
 .tb-left{display:flex;align-items:center;gap:15px}
-/* Container Logo agar ukurannya pas */
 .tb-logo-wrap{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tb-org{font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--tq-dark);border-right:1px solid var(--border);padding-right:15px}
 .tb-title{font-size:12px;color:var(--gray-700);font-weight:500}
 .tb-right{font-family:var(--mono);font-size:11px;color:var(--gray-500);white-space:nowrap}
 
-/* MAIN */
 .wrap{max-width:1200px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
-
-/* HERO */
 .hero{background:linear-gradient(135deg,var(--tq-dark) 0%,var(--tq) 55%,#00c4bc 100%);border-radius:var(--rl);padding:2rem 2.5rem;color:#fff;margin-bottom:1.5rem;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;right:-50px;top:-50px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
 .hero::after{content:'';position:absolute;right:60px;bottom:-90px;width:200px;height:200px;border-radius:50%;background:rgba(108,194,74,.12);pointer-events:none}
@@ -67,7 +58,6 @@ body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-
 .hero-meta span{font-size:12px;opacity:.85;display:flex;align-items:center;gap:5px}
 .hero-meta span::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gr-mid);display:inline-block;flex-shrink:0}
 
-/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
 .mc{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1.25rem;position:relative;overflow:hidden}
 .mc::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
@@ -83,15 +73,12 @@ body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-
 .mc-am .mc-val{color:var(--amber)}
 .mc-rd .mc-val{color:var(--red)}
 
-/* GRID */
 .g2{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;margin-bottom:14px}
 .g22{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
 
-/* CARDS */
 .card{background:var(--white);border-radius:var(--rl);border:1px solid var(--border);padding:1.25rem 1.5rem}
 .ct{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem}
 
-/* PROGRAM BARS */
 .prog{margin-bottom:15px}
 .prog:last-child{margin-bottom:0}
 .prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
@@ -102,12 +89,10 @@ body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-
 .pbar{width:100%;background:var(--gray-100);border-radius:4px;height:7px;overflow:hidden}
 .pfill{height:7px;border-radius:4px}
 
-/* LEGEND */
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px}
 .ldot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 .li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gray-500)}
 
-/* JENIS TABLE */
 .jtbl{width:100%;border-collapse:collapse;font-size:12px}
 .jtbl tr{border-bottom:1px solid #F0F9F9}
 .jtbl tr:last-child{border-bottom:none}
@@ -119,7 +104,6 @@ body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-
 .mbar{width:100%;background:var(--gray-100);border-radius:3px;height:5px}
 .mfill{height:5px;border-radius:3px}
 
-/* TABLE */
 .tbl-ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .tbl-ctrl label{font-size:12px;color:var(--gray-500)}
 select{font-size:12px;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--gray-900);cursor:pointer}
@@ -135,23 +119,17 @@ tbody tr:hover{background:#F4FAF9}
 .tnum{font-family:var(--mono);font-size:12px}
 .tpct{font-family:var(--mono);font-size:12px;font-weight:600;text-align:right}
 
-/* PILLS */
 .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.02em}
 .pg{background:var(--gr-pale);color:var(--gr-dark)}
 .pa{background:var(--amber-pale);color:var(--amber)}
 .pr{background:var(--red-pale);color:var(--red)}
 
-/* CHART */
 .cw{position:relative;width:100%}
-
-/* SUMMARY BADGES */
 .sbadges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
 .sb{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600}
 
-/* FOOTER */
 .footer{margin-top:2rem;text-align:center;font-size:11px;color:var(--gray-500);border-top:1px solid var(--border);padding-top:1rem;line-height:1.8}
 
-/* RESPONSIVE */
 @media(max-width:900px){
   .metrics{grid-template-columns:1fr 1fr}
   .g2,.g22{grid-template-columns:1fr}
@@ -171,19 +149,10 @@ tbody tr:hover{background:#F4FAF9}
 <nav class="topbar">
   <div class="tb-left">
     <div class="tb-logo-wrap">
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="48" fill="#0093AD"/>
-        <circle cx="50" cy="50" r="38" fill="#ffffff"/>
-        <path d="M43,15 h14 v70 h-14 z" fill="#0093AD"/>
-        <path d="M15,43 h70 v14 h-70 z" fill="#0093AD"/>
-        <circle cx="50" cy="50" r="10" fill="#ffffff"/>
-        <circle cx="50" cy="30" r="5" fill="#8DC63F"/>
-        <circle cx="40" cy="34" r="5" fill="#8DC63F"/>
-        <circle cx="60" cy="34" r="5" fill="#8DC63F"/>
-      </svg>
+      <img src="logo_kemenkes-removebg-preview.png" alt="Logo Kemenkes" style="max-width: 100%; max-height: 100%;">
     </div>
     <span class="tb-org">KEMKES RI</span>
-    <span class="tb-title">Ditjen Pencegahan &amp; Pengendalian Penyakit</span>
+    <span class="tb-title">Ditjen Penanggulangan Penyakit</span>
   </div>
   <div class="tb-right" id="clock"></div>
 </nav>
@@ -274,7 +243,7 @@ tbody tr:hover{background:#F4FAF9}
 
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem">
-      <div class="ct" style="margin:0">Realisasi per Satker</div>
+      <div class="ct:margin:0">Realisasi per Satker</div>
       <div class="tbl-ctrl" style="margin:0">
         <label>Status:</label>
         <select id="fStatus" onchange="renderTable()">
@@ -296,7 +265,7 @@ tbody tr:hover{background:#F4FAF9}
         <thead><tr>
           <th style="text-align:center">#</th>
           <th>Nama Satker</th>
-          <th>Pagu Harian (Rp Juta)</th>
+          <th>Pagu (Rp Juta)</th>
           <th>Realisasi (Rp Juta)</th>
           <th>Serapan</th>
           <th>Progress</th>
@@ -309,7 +278,7 @@ tbody tr:hover{background:#F4FAF9}
   </div>
 
   <div class="footer">
-    <strong style="color:var(--tq-dark)">Ditjen Pencegahan dan Pengendalian Penyakit — Kementerian Kesehatan Republik Indonesia</strong><br>
+    <strong style="color:var(--tq-dark)">Ditjen Penanggulangan Penyakit — Kementerian Kesehatan Republik Indonesia</strong><br>
     Data bersumber dari ADK DIPA (Revisi ke-7) dan GL KAS SPAN &nbsp;|&nbsp; Cut-off: <span id="ftDate"></span><br>
     Dashboard untuk keperluan monitoring internal dan transparansi publik
   </div>
@@ -317,48 +286,42 @@ tbody tr:hover{background:#F4FAF9}
 </div>
 
 <script>
-// ── 1. KONFIGURASI UMUM ──────────────────────────────────────
 const CONFIG = {
   tanggalData : '23 Mei 2026',
   nomorRevisi : 7,
   jumlahSatker: 52,
   totalPagu   : 1198860002000,
-  totalBlokir :   35327825000,
-  totalReal   :  335008502645,
+  totalBlokir : 35327825000,
+  totalReal   : 335008502645,
   targetBulan : 41.67,
 };
 
-// ── 2. DATA BULANAN KUMULATIF ────────────────────────────────
 const bulananData = [
-  { bln:'Jan', real:  24675091646 },
-  { bln:'Feb', real:  83512540509 },
+  { bln:'Jan', real: 24675091646 },
+  { bln:'Feb', real: 83512540509 },
   { bln:'Mar', real: 186016139137 },
   { bln:'Apr', real: 258900657231 },
-  { bln:'Mei', real: 335008502645 },
+  { bln:'Mei', real: 335008502645 }
 ];
 
-// ── 3. DATA PER PROGRAM ──────────────────────────────────────
 const programData = [
-  { kode:'02405WA', nama:'Pengendalian Penyakit Esselon I',   pagu: 780164470000, real: 279705553592 },
-  { kode:'02405DZ', nama:'Kekarantinaan Kesehatan Esselon I', pagu: 221485830000, real:  49563062678 },
-  { kode:'02405DX', nama:'Dukungan Manajemen Esselon I',      pagu: 197209702000, real:   5739886375 },
+  { kode:'02405WA', nama:'Pengendalian Penyakit Esselon I', pagu: 780164470000, real: 279705553592 },
+  { kode:'02405DZ', nama:'Kekarantinaan Kesehatan Esselon I', pagu: 221485830000, real: 49563062678 },
+  { kode:'02405DX', nama:'Dukungan Manajemen Esselon I', pagu: 197209702000, real: 5739886375 }
 ];
 
-// ── 4. DATA JENIS BELANJA ────────────────────────────────────
 const jenisData = [
-  { nama:'Belanja Pegawai',          pagu: 297348806000, real: 115851796987 },
-  { nama:'Belanja Pegawai (Transito)',pagu: 298172056000, real: 104436885982 },
-  { nama:'Belanja Jasa',             pagu: 280515901000, real:  35389776252 },
-  { nama:'Belanja Barang',           pagu: 111965263000, real:  22150162025 },
-  { nama:'Belanja Pemeliharaan',     pagu: 104907033000, real:  21663756841 },
-  { nama:'Belanja Bantuan Sosial',   pagu:  53202000000, real:  19620000000 },
-  { nama:'Belanja Perjalanan',       pagu:  34185112000, real:   9966323486 },
-  { nama:'Belanja Modal Peralatan',  pagu:  18323831000, real:   5929801072 },
-  { nama:'Belanja Modal Gedung',     pagu:    240000000, real:             0 },
+  { nama:'Belanja Pegawai', pagu: 297348806000, real: 115851796987 },
+  { nama:'Belanja Pegawai (Transito)', pagu: 298172056000, real: 104436885982 },
+  { nama:'Belanja Jasa', pagu: 280515901000, real: 35389776252 },
+  { nama:'Belanja Barang', pagu: 111965263000, real: 22150162025 },
+  { nama:'Belanja Pemeliharaan', pagu: 104907033000, real: 21663756841 },
+  { nama:'Belanja Bantuan Sosial', pagu: 53202000000, real: 19620000000 },
+  { nama:'Belanja Perjalanan', pagu: 34185112000, real: 9966323486 },
+  { nama:'Belanja Modal Peralatan', pagu: 18323831000, real: 5929801072 },
+  { nama:'Belanja Modal Gedung', pagu: 240000000, real: 0 }
 ];
 
-// ── DATA TAMBAHAN: KANTOR PUSAT & TIM KERJA SETDITJEN ─────────
-// KOREKSI: Menambahkan koma yang kurang dan seragamkan 'OK' jadi 'ok'
 const kpData = [
   { nama: 'Setditjen P2', pagu: 41955312000, real: 9174797780, ok: 2189539222 },
   { nama: 'Direktorat PM', pagu: 196721158000, real: 3449780700, ok: 41814443760 },
@@ -378,74 +341,72 @@ const timKerjaData = [
   { nama: 'Tim Kerja Dukungan Manajemen', pagu: 15865555000, real: 3271705804 },
   { nama: 'Tim Kerja Hibah', pagu: 101890000, real: 95843586 },
   { nama: 'Proyek Dukman GF', pagu: 17493733000, real: 4365937737 },
-  { nama: 'Proyek Care-I', pagu: 7691928000, real: 8516997927 } // KOREKSI: Hapus 'ok' karena tabel Setditjen tidak punya kolom OK
+  { nama: 'Proyek Care-I', pagu: 7691928000, real: 8516997927 }
 ];
 
-// ── 5. DATA SATKER ───────────────────────────────────────────
 const satkerData = [
-  { nama:'BKK Kelas I Manado',                        pagu:  11598953000, real:  5606759856 },
-  { nama:'LKK Labuan Bajo',                           pagu:   6192536000, real:  2537455391 },
-  { nama:'BKK Kelas II Lhokseumawe',                  pagu:  11064570000, real:  4476024308 },
-  { nama:'BKK Kelas II Bitung',                       pagu:   9189053000, real:  3713198482 },
-  { nama:'BKK Kelas I Gorontalo',                     pagu:  12463483000, real:  5027103308 },
-  { nama:'BKK Kelas I Kupang',                        pagu:  13879313000, real:  5559962317 },
-  { nama:'BKK Kelas I Jayapura',                      pagu:  13436838000, real:  5225115385 },
-  { nama:'BKK Kelas I Balikpapan',                    pagu:  19551486000, real:  7592083229 },
-  { nama:'BKK Kelas II Tembilahan',                   pagu:   9739338000, real:  3769743188 },
-  { nama:'BKK Kelas I Mataram',                       pagu:  18682276000, real:  7232576608 },
-  { nama:'BKK Kelas II Bengkulu',                     pagu:  12609360000, real:  4802046892 },
-  { nama:'BKK Kelas I Panjang',                       pagu:  17702720000, real:  6721868185 },
-  { nama:'BKK Kelas I Banda Aceh',                    pagu:  21140207000, real:  7978903423 },
-  { nama:'BKK Kelas II Manokwari',                    pagu:   9190173000, real:  3414826625 },
-  { nama:'BBKK Medan',                                pagu:  24507016000, real:  9091301183 },
-  { nama:'BKK Kelas I Tanjung Pinang',                pagu:  15262311000, real:  5634611917 },
-  { nama:'BKK Kelas II Sampit',                       pagu:   8270838000, real:  3043078072 },
-  { nama:'BKK Kelas I Cilacap',                       pagu:  13659510000, real:  4988105181 },
-  { nama:'BKK Kelas I Semarang',                      pagu:  23242606000, real:  8432468372 },
-  { nama:'BBKK Tanjung Priok',                        pagu:  35101092000, real: 12719403681 },
-  { nama:'BKK Kelas II Pangkal Pinang',               pagu:  14118856000, real:  5109808651 },
-  { nama:'BKK Kelas I Pekanbaru',                     pagu:  16841028000, real:  6080171938 },
-  { nama:'LKK Entikong',                              pagu:   7222905000, real:  2596086080 },
-  { nama:'BBKK Denpasar',                             pagu:  24879077000, real:  8939069202 },
-  { nama:'BKK Kelas II Merauke',                      pagu:   8146288000, real:  2908488366 },
-  { nama:'BKK Kelas I Banjarmasin',                   pagu:  22868481000, real:  8078326520 },
-  { nama:'BKK Kelas II Palu',                         pagu:  10680487000, real:  3765972396 },
-  { nama:'BKK Kelas II Sabang',                       pagu:   7287180000, real:  2564268948 },
-  { nama:'BKK Kelas I Bandung',                       pagu:  26588773000, real:  9330098274 },
-  { nama:'BKK Kelas I Kendari',                       pagu:  16564783000, real:  5792135800 },
-  { nama:'BKK Kelas I Dumai',                         pagu:  13627006000, real:  4751591073 },
-  { nama:'BKK Kelas II Palangkaraya',                 pagu:  10927111000, real:  3794675267 },
-  { nama:'BKK Kelas II Yogyakarta',                   pagu:  11385260000, real:  3932461301 },
-  { nama:'BKK Kelas I Tanjung Balai Karimun',         pagu:  11363557000, real:  3925414586 },
-  { nama:'BKK Kelas I Palembang',                     pagu:  18332808000, real:  6282515103 },
-  { nama:'BKK Kelas II Jambi',                        pagu:  14153240000, real:  4843686329 },
-  { nama:'BKK Kelas I Pontianak',                     pagu:  14195770000, real:  4831926810 },
-  { nama:'BKK Kelas I Tarakan',                       pagu:  15074295000, real:  5107290383 },
-  { nama:'BKK Kelas I Probolinggo',                   pagu:  18060843000, real:  6106512577 },
-  { nama:'BKK Kelas II Biak',                         pagu:   8889726000, real:  3000489720 },
-  { nama:'BBKK Makassar',                             pagu:  30499685000, real: 10280781677 },
-  { nama:'BKK Kelas II Sorong',                       pagu:  12007083000, real:  4017548344 },
-  { nama:'BKK Kelas I Banten',                        pagu:  18726019000, real:  6248323876 },
-  { nama:'BKK Kelas II Poso',                         pagu:  10978601000, real:  3624915403 },
-  { nama:'BKK Kelas I Ambon',                         pagu:  12284037000, real:  3958468343 },
-  { nama:'BKK Kelas I Padang',                        pagu:  15367065000, real:  4927008205 },
-  { nama:'BKK Kelas I Samarinda',                     pagu:  18891417000, real:  6046046344 },
-  { nama:'BBKK Batam',                                pagu:  26313381000, real:  8403709116 },
-  { nama:'BBKK Soekarno Hatta',                       pagu:  34941668000, real: 10788361410 },
-  { nama:'BBKK Surabaya',                             pagu:  45716260000, real: 13167287108 },
-  { nama:'BKK Kelas I Ternate',                       pagu:  14270366000, real:  4097800327 },
-  { nama:'Kantor Pusat Ditjen P2',                    pagu: 361173267000, real: 40140627565 },
+  { nama:'BKK Kelas I Manado', pagu: 11598953000, real: 5606759856 },
+  { nama:'LKK Labuan Bajo', pagu: 6192536000, real: 2537455391 },
+  { nama:'BKK Kelas II Lhokseumawe', pagu: 11064570000, real: 4476024308 },
+  { nama:'BKK Kelas II Bitung', pagu: 9189053000, real: 3713198482 },
+  { nama:'BKK Kelas I Gorontalo', pagu: 12463483000, real: 5027103308 },
+  { nama:'BKK Kelas I Kupang', pagu: 13879313000, real: 5559962317 },
+  { nama:'BKK Kelas I Jayapura', pagu: 13436838000, real: 5225115385 },
+  { nama:'BKK Kelas I Balikpapan', pagu: 19551486000, real: 7592083229 },
+  { nama:'BKK Kelas II Tembilahan', pagu: 9739338000, real: 3769743188 },
+  { nama:'BKK Kelas I Mataram', pagu: 18682276000, real: 7232576608 },
+  { nama:'BKK Kelas II Bengkulu', pagu: 12609360000, real: 4802046892 },
+  { nama:'BKK Kelas I Panjang', pagu: 17702720000, real: 6721868185 },
+  { nama:'BKK Kelas I Banda Aceh', pagu: 21140207000, real: 7978903423 },
+  { nama:'BKK Kelas II Manokwari', pagu: 9190173000, real: 3414826625 },
+  { nama:'BBKK Medan', pagu: 24507016000, real: 9091301183 },
+  { nama:'BKK Kelas I Tanjung Pinang', pagu: 15262311000, real: 5634611917 },
+  { nama:'BKK Kelas II Sampit', pagu: 8270838000, real: 3043078072 },
+  { nama:'BKK Kelas I Cilacap', pagu: 13659510000, real: 4988105181 },
+  { nama:'BKK Kelas I Semarang', pagu: 23242606000, real: 8432468372 },
+  { nama:'BBKK Tanjung Priok', pagu: 35101092000, real: 12719403681 },
+  { nama:'BKK Kelas II Pangkal Pinang', pagu: 14118856000, real: 5109808651 },
+  { nama:'BKK Kelas I Pekanbaru', pagu: 16841028000, real: 6080171938 },
+  { nama:'LKK Entikong', pagu: 7222905000, real: 2596086080 },
+  { nama:'BBKK Denpasar', pagu: 24879077000, real: 8939069202 },
+  { nama:'BKK Kelas II Merauke', pagu: 8146288000, real: 2908488366 },
+  { nama:'BKK Kelas I Banjarmasin', pagu: 22868481000, real: 8078326520 },
+  { nama:'BKK Kelas II Palu', pagu: 10680487000, real: 3765972396 },
+  { nama:'BKK Kelas II Sabang', pagu: 7287180000, real: 2564268948 },
+  { nama:'BKK Kelas I Bandung', pagu: 26588773000, real: 9330098274 },
+  { nama:'BKK Kelas I Kendari', pagu: 16564783000, real: 5792135800 },
+  { nama:'BKK Kelas I Dumai', pagu: 13627006000, real: 4751591073 },
+  { nama:'BKK Kelas II Palangkaraya', pagu: 10927111000, real: 3794675267 },
+  { nama:'BKK Kelas II Yogyakarta', pagu: 11385260000, real: 3932461301 },
+  { nama:'BKK Kelas I Tanjung Balai Karimun', pagu: 11363557000, real: 3925414586 },
+  { nama:'BKK Kelas I Palembang', pagu: 18332808000, real: 6282515103 },
+  { nama:'BKK Kelas II Jambi', pagu: 14153240000, real: 4843686329 },
+  { nama:'BKK Kelas I Pontianak', pagu: 14195770000, real: 4831926810 },
+  { nama:'BKK Kelas I Tarakan', pagu: 15074295000, real: 5107290383 },
+  { nama:'BKK Kelas I Probolinggo', pagu: 18060843000, real: 6106512577 },
+  { nama:'BKK Kelas II Biak', pagu: 8889726000, real: 3000489720 },
+  { nama:'BBKK Makassar', pagu: 30499685000, real: 10280781677 },
+  { nama:'BKK Kelas II Sorong', pagu: 12007083000, real: 4017548344 },
+  { nama:'BKK Kelas I Banten', pagu: 18726019000, real: 6248323876 },
+  { nama:'BKK Kelas II Poso', pagu: 10978601000, real: 3624915403 },
+  { nama:'BKK Kelas I Ambon', pagu: 12284037000, real: 3958468343 },
+  { nama:'BKK Kelas I Padang', pagu: 15367065000, real: 4927008205 },
+  { nama:'BKK Kelas I Samarinda', pagu: 18891417000, real: 6046046344 },
+  { nama:'BBKK Batam', pagu: 26313381000, real: 8403709116 },
+  { nama:'BBKK Soekarno Hatta', pagu: 34941668000, real: 10788361410 },
+  { nama:'BBKK Surabaya', pagu: 45716260000, real: 13167287108 },
+  { nama:'BKK Kelas I Ternate', pagu: 14270366000, real: 4097800327 },
+  { nama:'Kantor Pusat Ditjen P2', pagu: 361173267000, real: 40140627565 }
 ];
 
-// ── RENDERING ENGINE ─────────────────────────────────────────
-const fmtM   = v => (v/1e9).toFixed(2);
-const fmtJt  = v => Math.round(v/1e6).toLocaleString('id-ID');
-const pct    = (r,p) => p>0 ? +(r/p*100).toFixed(2) : 0;
-const gc     = 'rgba(0,0,0,.05)';
-const tc     = '#999';
+const fmtM = v => (v/1e9).toFixed(2);
+const fmtJt = v => Math.round(v/1e6).toLocaleString('id-ID');
+const pct = (r,p) => p>0 ? +(r/p*100).toFixed(2) : 0;
+const gc = 'rgba(0,0,0,.05)';
+const tc = '#999';
 
 function colForPct(p){ return p>=35?'#007A75':p>=25?'#D97706':'#B91C1C'; }
-function skeyPct(p)  { return p>=35?'baik':p>=25?'perhatian':'rendah'; }
+function skeyPct(p){ return p>=35?'baik':p>=25?'perhatian':'rendah'; }
 function badgePct(p){
   if(p>=35) return '<span class="pill pg">✅ Baik</span>';
   if(p>=25) return '<span class="pill pa">⚠️ Perhatian</span>';
@@ -454,14 +415,14 @@ function badgePct(p){
 
 function tick(){
   const n=new Date();
-  document.getElementById('clock').textContent=
+  document.getElementById('clock').textContent =
     n.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+
     '  '+n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
 }
 tick(); setInterval(tick,1000);
 
-document.getElementById('ftDate').textContent=CONFIG.tanggalData;
-document.getElementById('heroMeta').innerHTML=[
+document.getElementById('ftDate').textContent = CONFIG.tanggalData;
+document.getElementById('heroMeta').innerHTML = [
   `<span>Data per ${CONFIG.tanggalData}</span>`,
   `<span>Revisi DIPA ke-${CONFIG.nomorRevisi}</span>`,
   `<span>${CONFIG.jumlahSatker} Satker Seluruh Indonesia</span>`,
@@ -469,10 +430,10 @@ document.getElementById('heroMeta').innerHTML=[
 ].join('');
 
 const paguBersih = CONFIG.totalPagu - CONFIG.totalBlokir;
-const pctReal    = pct(CONFIG.totalReal, CONFIG.totalPagu);
-const pctBersih  = pct(CONFIG.totalReal, paguBersih);
-const deviasi    = (pctReal - CONFIG.targetBulan).toFixed(2);
-const sisa       = CONFIG.totalPagu - CONFIG.totalReal;
+const pctReal = pct(CONFIG.totalReal, CONFIG.totalPagu);
+const pctBersih = pct(CONFIG.totalReal, paguBersih);
+const deviasi = (pctReal - CONFIG.targetBulan).toFixed(2);
+const sisa = CONFIG.totalPagu - CONFIG.totalReal;
 
 document.getElementById('metricsRow').innerHTML=`
 <div class="mc mc-tq">
@@ -497,7 +458,7 @@ document.getElementById('metricsRow').innerHTML=`
 </div>`;
 
 const progColors = ['#00A19A','#6CC24A','#D97706'];
-document.getElementById('progRows').innerHTML = programData.map((p,i)=>{
+document.getElementById('progRows').innerHTML = programData.map((p)=>{
   const pc = pct(p.real,p.pagu);
   const col= pc>=35?progColors[0]:pc>=25?progColors[1]:progColors[2];
   return `<div class="prog">
@@ -511,7 +472,7 @@ document.getElementById('progRows').innerHTML = programData.map((p,i)=>{
 }).join('');
 
 document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
-  const pc  = pct(d.real,d.pagu);
+  const pc = pct(d.real,d.pagu);
   const col = colForPct(pc);
   return `<tr>
     <td class="jname">${d.nama}</td>
@@ -521,7 +482,6 @@ document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
   </tr>`;
 }).join('');
 
-// RENDER TABEL KANTOR PUSAT
 document.getElementById('tBodyKp').innerHTML = kpData.map(d => {
   const p = pct(d.real, d.pagu);
   return `<tr>
@@ -538,7 +498,6 @@ document.getElementById('tBodyKp').innerHTML = kpData.map(d => {
   </tr>`;
 }).join('');
 
-// RENDER TABEL SETDITJEN
 document.getElementById('tBodyTim').innerHTML = timKerjaData.map(d => {
   const p = pct(d.real, d.pagu);
   return `<tr>
@@ -554,15 +513,13 @@ document.getElementById('tBodyTim').innerHTML = timKerjaData.map(d => {
   </tr>`;
 }).join('');
 
-
-const totalPaguM = CONFIG.totalPagu / 1e9;
 const idealPer12 = bulananData.map((_,i)=>+((CONFIG.totalPagu*(CONFIG.targetBulan/100)/(12))*(i+1)/1e9).toFixed(1));
 
 new Chart(document.getElementById('cBulan'),{
   data:{
     labels: bulananData.map(d=>d.bln),
     datasets:[
-      {type:'bar',  label:'Realisasi',data:bulananData.map(d=>+(d.real/1e9).toFixed(2)),
+      {type:'bar', label:'Realisasi',data:bulananData.map(d=>+(d.real/1e9).toFixed(2)),
        backgroundColor:'rgba(0,161,154,.72)',borderRadius:5,order:2},
       {type:'line', label:'Target Ideal',data:idealPer12,
        borderColor:'#D97706',borderDash:[6,4],borderWidth:2,
