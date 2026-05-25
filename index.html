@@ -241,6 +241,43 @@ tbody tr:hover{background:#F4FAF9}
     </div>
   </div>
 
+  <div class="g22">
+    <div class="card">
+      <div class="ct" style="margin-bottom:1rem; font-family: 'Century Gothic', sans-serif; font-weight: bold; font-size: 13px;">Realisasi per Jenis Kewenangan</div>
+      <div class="tbl-wrap">
+        <table class="jtbl" style="min-width:100%">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border);text-align:left;color:var(--gray-500); font-family: 'Century Gothic', sans-serif;">
+              <th style="padding-bottom:10px;font-weight:bold">Jenis Kewenangan</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Pagu</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Realisasi</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:center">%</th>
+              <th style="padding-bottom:10px;font-weight:bold">Progress</th>
+            </tr>
+          </thead>
+          <tbody id="tBodyKewenangan"></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="ct" style="margin-bottom:1rem; font-family: 'Century Gothic', sans-serif; font-weight: bold; font-size: 13px;">Realisasi per Sumber Dana</div>
+      <div class="tbl-wrap">
+        <table class="jtbl" style="min-width:100%">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border);text-align:left;color:var(--gray-500); font-family: 'Century Gothic', sans-serif;">
+              <th style="padding-bottom:10px;font-weight:bold">Sumber Dana</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Pagu</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Realisasi</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:center">%</th>
+              <th style="padding-bottom:10px;font-weight:bold">Progress</th>
+            </tr>
+          </thead>
+          <tbody id="tBodySumberDana"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem">
       <div class="ct" style="margin:0">Realisasi per Satker</div>
@@ -554,6 +591,55 @@ new Chart(document.getElementById('cBulNon'),{
     }
   }
 });
+
+// --- DATA & RENDER TAMBAHAN: KEWENANGAN & SUMBER DANA ---
+const kpPagu = 361173267000;
+const kpReal = 40140627565;
+const kdPagu = CONFIG.totalPagu - kpPagu;
+const kdReal = CONFIG.totalReal - kpReal;
+
+const kewenanganData = [
+  { nama: 'Kantor Pusat (KP)', pagu: kpPagu, real: kpReal },
+  { nama: 'Kantor Daerah (UPT)', pagu: kdPagu, real: kdReal }
+];
+
+const sumberDanaData = [
+  { nama: 'RM', pagu: 963616608000, real: 305144853148 },
+  { nama: 'PNBP', pagu: 120776460000, real: 29863649497 },
+  { nama: 'CARE-I', pagu: 74233432000, real: 0 },
+  { nama: 'GF AIDS', pagu: 40233502000, real: 0 }
+];
+
+document.getElementById('tBodyKewenangan').innerHTML = kewenanganData.map(d => {
+  const p = pct(d.real, d.pagu);
+  return `<tr>
+    <td class="jname" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${d.nama}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.pagu)}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.real)}</td>
+    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:bold;font-family:'Century Gothic', sans-serif;">${p.toFixed(2)}%</td>
+    <td style="min-width:80px">
+      <div class="mbar">
+        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
+      </div>
+    </td>
+  </tr>`;
+}).join('');
+
+document.getElementById('tBodySumberDana').innerHTML = sumberDanaData.map(d => {
+  const p = pct(d.real, d.pagu);
+  return `<tr>
+    <td class="jname" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${d.nama}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.pagu)}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.real)}</td>
+    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:bold;font-family:'Century Gothic', sans-serif;">${p.toFixed(2)}%</td>
+    <td style="min-width:80px">
+      <div class="mbar">
+        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
+      </div>
+    </td>
+  </tr>`;
+}).join('');
+// --- BATAS DATA TAMBAHAN ---
 
 function renderTable(){
   const fv=document.getElementById('fStatus').value;
