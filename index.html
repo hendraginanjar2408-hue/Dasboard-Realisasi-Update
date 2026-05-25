@@ -42,7 +42,8 @@ body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-
 
 .topbar{background:var(--white);color:var(--gray-900);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.05);border-bottom:1px solid var(--border)}
 .tb-left{display:flex;align-items:center;gap:15px}
-.tb-logo-wrap{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+/* Penyesuaian agar lebar logo otomatis menyesuaikan tinggi */
+.tb-logo-wrap{height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tb-org{font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--tq-dark);border-right:1px solid var(--border);padding-right:15px}
 .tb-title{font-size:12px;color:var(--gray-700);font-weight:500}
 .tb-right{font-family:var(--mono);font-size:11px;color:var(--gray-500);white-space:nowrap}
@@ -149,7 +150,7 @@ tbody tr:hover{background:#F4FAF9}
 <nav class="topbar">
   <div class="tb-left">
     <div class="tb-logo-wrap">
-      <img src="https://kemkes.go.id/app_asset/image_content_download/170608421265b0c77488c048.52529672.png" alt="Logo Kemenkes" style="max-width: 100%; max-height: 100%;">
+      <img src="https://kemkes.go.id/app_asset/image_content_download/170608421265b0c77488c048.52529672.png" alt="Logo Kemenkes" style="height: 40px; width: auto; object-fit: contain;">
     </div>
     <span class="tb-org">KEMKES RI</span>
     <span class="tb-title">Ditjen Penanggulangan Penyakit</span>
@@ -243,7 +244,7 @@ tbody tr:hover{background:#F4FAF9}
 
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem">
-      <div class="ct:margin:0">Realisasi per Satker</div>
+      <div class="ct" style="margin:0">Realisasi per Satker</div>
       <div class="tbl-ctrl" style="margin:0">
         <label>Status:</label>
         <select id="fStatus" onchange="renderTable()">
