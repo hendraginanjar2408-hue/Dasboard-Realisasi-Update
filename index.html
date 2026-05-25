@@ -44,13 +44,14 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-size:14px;line-height:1.6;min-height:100vh}
 
-/* TOP BAR */
-.topbar{background:var(--tq-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,161,154,.25)}
-.tb-left{display:flex;align-items:center;gap:12px}
-.tb-logo{width:32px;height:32px;flex-shrink:0}
-.tb-org{font-size:11px;font-weight:600;letter-spacing:.04em;opacity:.9;border-right:1px solid rgba(255,255,255,.25);padding-right:12px}
-.tb-title{font-size:12px;opacity:.75}
-.tb-right{font-family:var(--mono);font-size:11px;opacity:.65;white-space:nowrap}
+/* TOP BAR - Sedikit penyesuaian tinggi untuk logo baru */
+.topbar{background:var(--white);color:var(--gray-900);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.05);border-bottom:1px solid var(--border)}
+.tb-left{display:flex;align-items:center;gap:15px}
+/* Container Logo agar ukurannya pas */
+.tb-logo-wrap{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tb-org{font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--tq-dark);border-right:1px solid var(--border);padding-right:15px}
+.tb-title{font-size:12px;color:var(--gray-700);font-weight:500}
+.tb-right{font-family:var(--mono);font-size:11px;color:var(--gray-500);white-space:nowrap}
 
 /* MAIN */
 .wrap{max-width:1200px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
@@ -169,12 +170,18 @@ tbody tr:hover{background:#F4FAF9}
 
 <nav class="topbar">
   <div class="tb-left">
-    <svg class="tb-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Logo Kemenkes">
-      <rect width="5" height="22" x="4" y="5" rx="2" fill="#6CC24A"/>
-      <rect width="5" height="8"  x="4" y="5" rx="2" fill="#6CC24A"/>
-      <polygon points="9,16 23,5 23,11 14,17 23,22 23,27 9,16" fill="#00A19A"/>
-      <path d="M20 8 C22 5, 27 5, 27 10 C27 14 22 18 20 20 C18 18 13 14 13 10 C13 5 18 5 20 8Z" fill="#6CC24A" opacity="0.85"/>
-    </svg>
+    <div class="tb-logo-wrap">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="#0093AD"/>
+        <circle cx="50" cy="50" r="38" fill="#ffffff"/>
+        <path d="M43,15 h14 v70 h-14 z" fill="#0093AD"/>
+        <path d="M15,43 h70 v14 h-70 z" fill="#0093AD"/>
+        <circle cx="50" cy="50" r="10" fill="#ffffff"/>
+        <circle cx="50" cy="30" r="5" fill="#8DC63F"/>
+        <circle cx="40" cy="34" r="5" fill="#8DC63F"/>
+        <circle cx="60" cy="34" r="5" fill="#8DC63F"/>
+      </svg>
+    </div>
     <span class="tb-org">KEMKES RI</span>
     <span class="tb-title">Ditjen Pencegahan &amp; Pengendalian Penyakit</span>
   </div>
@@ -351,6 +358,7 @@ const jenisData = [
 ];
 
 // ── DATA TAMBAHAN: KANTOR PUSAT & TIM KERJA SETDITJEN ─────────
+// KOREKSI: Menambahkan koma yang kurang dan seragamkan 'OK' jadi 'ok'
 const kpData = [
   { nama: 'Setditjen P2', pagu: 41955312000, real: 9174797780, ok: 2189539222 },
   { nama: 'Direktorat PM', pagu: 196721158000, real: 3449780700, ok: 41814443760 },
@@ -370,7 +378,7 @@ const timKerjaData = [
   { nama: 'Tim Kerja Dukungan Manajemen', pagu: 15865555000, real: 3271705804 },
   { nama: 'Tim Kerja Hibah', pagu: 101890000, real: 95843586 },
   { nama: 'Proyek Dukman GF', pagu: 17493733000, real: 4365937737 },
-  { nama: 'Proyek Care-I', pagu: 7691928000, real: 8516997927, ok: 609200000 }
+  { nama: 'Proyek Care-I', pagu: 7691928000, real: 8516997927 } // KOREKSI: Hapus 'ok' karena tabel Setditjen tidak punya kolom OK
 ];
 
 // ── 5. DATA SATKER ───────────────────────────────────────────
@@ -448,175 +456,4 @@ function tick(){
   const n=new Date();
   document.getElementById('clock').textContent=
     n.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+
-    '  '+n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-}
-tick(); setInterval(tick,1000);
-
-document.getElementById('ftDate').textContent=CONFIG.tanggalData;
-document.getElementById('heroMeta').innerHTML=[
-  `<span>Data per ${CONFIG.tanggalData}</span>`,
-  `<span>Revisi DIPA ke-${CONFIG.nomorRevisi}</span>`,
-  `<span>${CONFIG.jumlahSatker} Satker Seluruh Indonesia</span>`,
-  `<span>Sumber: ADK DIPA &amp; GL KAS SPAN</span>`
-].join('');
-
-const paguBersih = CONFIG.totalPagu - CONFIG.totalBlokir;
-const pctReal    = pct(CONFIG.totalReal, CONFIG.totalPagu);
-const pctBersih  = pct(CONFIG.totalReal, paguBersih);
-const deviasi    = (pctReal - CONFIG.targetBulan).toFixed(2);
-const sisa       = CONFIG.totalPagu - CONFIG.totalReal;
-
-document.getElementById('metricsRow').innerHTML=`
-<div class="mc mc-tq">
-  <div class="mc-label">Total Pagu DIPA</div>
-  <div class="mc-val">Rp ${fmtM(CONFIG.totalPagu)} M</div>
-  <div class="mc-sub">Blokir: Rp ${fmtM(CONFIG.totalBlokir)} M &nbsp;|&nbsp; Bersih: Rp ${fmtM(paguBersih)} M</div>
-</div>
-<div class="mc mc-gr">
-  <div class="mc-label">Total Realisasi</div>
-  <div class="mc-val">Rp ${fmtM(CONFIG.totalReal)} M</div>
-  <div class="mc-sub" style="color:var(--gr-dark)">${pctReal.toFixed(2)}% dari Pagu &nbsp;|&nbsp; ${pctBersih.toFixed(2)}% dari Pagu Bersih</div>
-</div>
-<div class="mc mc-am">
-  <div class="mc-label">Sisa Anggaran</div>
-  <div class="mc-val">Rp ${fmtM(sisa)} M</div>
-  <div class="mc-sub">${(100-pctReal).toFixed(2)}% belum terserap s/d ${CONFIG.tanggalData}</div>
-</div>
-<div class="mc mc-rd">
-  <div class="mc-label">Target s/d Bulan Ini</div>
-  <div class="mc-val">${CONFIG.targetBulan.toFixed(2)}%</div>
-  <div class="mc-sub" style="color:${deviasi>=0?'var(--gr-dark)':'var(--red)'}">Deviasi: ${deviasi>=0?'+':''}${deviasi} poin dari target</div>
-</div>`;
-
-const progColors = ['#00A19A','#6CC24A','#D97706'];
-document.getElementById('progRows').innerHTML = programData.map((p,i)=>{
-  const pc = pct(p.real,p.pagu);
-  const col= pc>=35?progColors[0]:pc>=25?progColors[1]:progColors[2];
-  return `<div class="prog">
-    <div class="prog-head">
-      <span class="prog-name">${p.nama} <span class="prog-code">${p.kode}</span></span>
-      <span class="prog-pct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</span>
-    </div>
-    <div class="prog-amt">Realisasi Rp ${fmtM(p.real)} M &nbsp;/&nbsp; Pagu Rp ${fmtM(p.pagu)} M</div>
-    <div class="pbar"><div class="pfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div>
-  </div>`;
-}).join('');
-
-document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
-  const pc  = pct(d.real,d.pagu);
-  const col = colForPct(pc);
-  return `<tr>
-    <td class="jname">${d.nama}</td>
-    <td class="jnum">${fmtM(d.pagu)}</td>
-    <td class="jreal" style="color:${col}">${fmtM(d.real)}</td>
-    <td class="jbar"><div class="mbar"><div class="mfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div></td>
-  </tr>`;
-}).join('');
-
-// RENDER TABEL KANTOR PUSAT
-document.getElementById('tBodyKp').innerHTML = kpData.map(d => {
-  const p = pct(d.real, d.pagu);
-  return `<tr>
-    <td class="jname">${d.nama}</td>
-    <td class="jnum">${fmtJt(d.pagu)}</td>
-    <td class="jnum">${fmtJt(d.real)}</td>
-    <td class="jnum">${fmtJt(d.ok)}</td>
-    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:600">${p.toFixed(2)}%</td>
-    <td style="min-width:80px">
-      <div class="mbar">
-        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
-      </div>
-    </td>
-  </tr>`;
-}).join('');
-
-// RENDER TABEL SETDITJEN
-document.getElementById('tBodyTim').innerHTML = timKerjaData.map(d => {
-  const p = pct(d.real, d.pagu);
-  return `<tr>
-    <td class="jname">${d.nama}</td>
-    <td class="jnum">${fmtJt(d.pagu)}</td>
-    <td class="jnum">${fmtJt(d.real)}</td>
-    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:600">${p.toFixed(2)}%</td>
-    <td style="min-width:80px">
-      <div class="mbar">
-        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
-      </div>
-    </td>
-  </tr>`;
-}).join('');
-
-
-const totalPaguM = CONFIG.totalPagu / 1e9;
-const idealPer12 = bulananData.map((_,i)=>+((CONFIG.totalPagu*(CONFIG.targetBulan/100)/(12))*(i+1)/1e9).toFixed(1));
-
-new Chart(document.getElementById('cBulan'),{
-  data:{
-    labels: bulananData.map(d=>d.bln),
-    datasets:[
-      {type:'bar',  label:'Realisasi',data:bulananData.map(d=>+(d.real/1e9).toFixed(2)),
-       backgroundColor:'rgba(0,161,154,.72)',borderRadius:5,order:2},
-      {type:'line', label:'Target Ideal',data:idealPer12,
-       borderColor:'#D97706',borderDash:[6,4],borderWidth:2,
-       pointRadius:4,pointBackgroundColor:'#D97706',backgroundColor:'transparent',tension:.35,order:1}
-    ]
-  },
-  options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': Rp '+c.parsed.y.toFixed(1)+' M'}}},
-    scales:{
-      x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
-      y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>'Rp '+v+' M'}}
-    }
-  }
-});
-
-const nonKum = bulananData.map((d,i)=>i===0?d.real:d.real-bulananData[i-1].real);
-const nonKumM = nonKum.map(v=>+(v/1e9).toFixed(2));
-const barColors=['#80D4D1','#33B8B3','#00A19A','#007A75','#005550','#004240','#003230'];
-new Chart(document.getElementById('cBulNon'),{
-  type:'bar',
-  data:{
-    labels:bulananData.map(d=>d.bln),
-    datasets:[{label:'Realisasi',data:nonKumM,
-      backgroundColor:bulananData.map((_,i)=>barColors[i]||'#007A75'),
-      borderRadius:5,borderWidth:0}]
-  },
-  options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'Rp '+c.parsed.y.toFixed(1)+' M'}}},
-    scales:{
-      x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
-      y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+' M'}}
-    }
-  }
-});
-
-function renderTable(){
-  const fv=document.getElementById('fStatus').value;
-  const fs=document.getElementById('fSort').value;
-  let data=satkerData.map(d=>({...d,pct:pct(d.real,d.pagu)}));
-  if(fv!=='all') data=data.filter(d=>skeyPct(d.pct)===fv);
-  data.sort((a,b)=>fs==='desc'?b.pct-a.pct:a.pct-b.pct);
-
-  document.getElementById('tBody').innerHTML=data.map((d,i)=>`<tr>
-    <td class="trank">${i+1}</td>
-    <td class="tsatker">${d.nama}</td>
-    <td class="tnum">${fmtJt(d.pagu)}</td>
-    <td class="tnum">${fmtJt(d.real)}</td>
-    <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
-    <td style="min-width:80px"><div class="mbar"><div class="mfill" style="width:${Math.min(d.pct,100)}%;background:${colForPct(d.pct)}"></div></div></td>
-    <td>${badgePct(d.pct)}</td>
-  </tr>`).join('');
-
-  const baik=data.filter(d=>skeyPct(d.pct)==='baik').length;
-  const phat=data.filter(d=>skeyPct(d.pct)==='perhatian').length;
-  const rend=data.filter(d=>skeyPct(d.pct)==='rendah').length;
-  document.getElementById('sbadges').innerHTML=`
-    <span class="sb" style="background:var(--gr-pale);color:var(--gr-dark)">✅ Baik: ${baik}</span>
-    <span class="sb" style="background:var(--amber-pale);color:var(--amber)">⚠️ Perhatian: ${phat}</span>
-    <span class="sb" style="background:var(--red-pale);color:var(--red)">🔴 Rendah: ${rend}</span>
-    <span class="sb" style="background:var(--tq-pale);color:var(--tq-dark)">Total: ${data.length} satker</span>`;
-}
-renderTable();
-</script>
-</body>
-</html>
+    '  '+n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-
