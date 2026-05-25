@@ -224,16 +224,34 @@ tbody tr:hover{background:#F4FAF9}
     </div>
     
     <div class="card">
-      <div class="ct" style="margin-bottom:1rem">Realisasi Setditjen per Tim Kerja</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem">
+        <div class="ct" style="margin:0">Realisasi Setditjen per Tim Kerja</div>
+        <div class="tbl-ctrl" style="margin:0">
+          <label>Status:</label>
+          <select id="fStatusTim" onchange="renderTimTable()">
+            <option value="all">Semua</option>
+            <option value="baik">✅ Baik (≥35%)</option>
+            <option value="perhatian">⚠️ Perhatian (25–34%)</option>
+            <option value="rendah">🔴 Rendah (&lt;25%)</option>
+          </select>
+          <label>Urutan:</label>
+          <select id="fSortTim" onchange="renderTimTable()">
+            <option value="desc">Tertinggi ↓</option>
+            <option value="asc">Terendah ↑</option>
+          </select>
+        </div>
+      </div>
       <div class="tbl-wrap">
         <table class="jtbl" style="min-width:100%">
           <thead>
             <tr style="border-bottom:2px solid var(--border);text-align:left;color:var(--gray-500)">
+              <th style="padding-bottom:10px;text-align:center;font-weight:600">#</th>
               <th style="padding-bottom:10px;font-weight:600">Tim Kerja</th>
-              <th style="padding-bottom:10px;font-weight:600;text-align:right">Pagu</th>
-              <th style="padding-bottom:10px;font-weight:600;text-align:right">Realisasi</th>
+              <th style="padding-bottom:10px;font-weight:600;text-align:right">Pagu (Juta)</th>
+              <th style="padding-bottom:10px;font-weight:600;text-align:right">Realisasi (Juta)</th>
               <th style="padding-bottom:10px;font-weight:600;text-align:center">%</th>
               <th style="padding-bottom:10px">Progress</th>
+              <th style="padding-bottom:10px">Status</th>
             </tr>
           </thead>
           <tbody id="tBodyTim"></tbody>
@@ -361,7 +379,6 @@ const jenisData = [
   { nama:'Belanja Modal Gedung', pagu: 240000000, real: 0 }
 ];
 
-// Data Rincian Realisasi Kantor Pusat 
 const kpDetailData = [
   { unit: 'Setditjen P2', rows: [
     { sumber: 'RM', pagu: 34263384000, real: 9058157780, ok: 1580339222 },
@@ -540,7 +557,6 @@ document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
   </tr>`;
 }).join('');
 
-// Render Ulang Tabel Kantor Pusat (Nested Array) DENGAN FONT NORMAL DAN DIBAGI 1 JUTA
 document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
   let html = '';
   let totalPagu = 0, totalReal = 0, totalOk = 0;
@@ -580,20 +596,33 @@ document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
   return html;
 }).join('');
 
-document.getElementById('tBodyTim').innerHTML = timKerjaData.map(d => {
-  const p = pct(d.real, d.pagu);
-  return `<tr>
-    <td class="jname">${d.nama}</td>
-    <td class="jnum">${fmtJt(d.pagu)}</td>
-    <td class="jnum">${fmtJt(d.real)}</td>
-    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:600">${p.toFixed(2)}%</td>
-    <td style="min-width:80px">
-      <div class="mbar">
-        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
-      </div>
-    </td>
-  </tr>`;
-}).join('');
+// --- TAMBAHAN FUNGSI SORTING & FILTER UNTUK TIM KERJA ---
+function renderTimTable(){
+  const fv = document.getElementById('fStatusTim').value;
+  const fs = document.getElementById('fSortTim').value;
+  let data = timKerjaData.map(d => ({ ...d, pct: pct(d.real, d.pagu) }));
+  
+  if(fv !== 'all') data = data.filter(d => skeyPct(d.pct) === fv);
+  data.sort((a, b) => fs === 'desc' ? b.pct - a.pct : a.pct - b.pct);
+
+  document.getElementById('tBodyTim').innerHTML = data.map((d, i) => `
+    <tr>
+      <td class="trank">${i + 1}</td>
+      <td class="jname">${d.nama}</td>
+      <td class="jnum">${fmtJt(d.pagu)}</td>
+      <td class="jnum">${fmtJt(d.real)}</td>
+      <td class="jnum" style="color:${colForPct(d.pct)};text-align:center;font-weight:600">${d.pct.toFixed(2)}%</td>
+      <td style="min-width:80px">
+        <div class="mbar">
+          <div class="mfill" style="width:${Math.min(d.pct, 100)}%;background:${colForPct(d.pct)}"></div>
+        </div>
+      </td>
+      <td>${badgePct(d.pct)}</td>
+    </tr>
+  `).join('');
+}
+renderTimTable();
+// --------------------------------------------------------
 
 const idealPer12 = bulananData.map((_,i)=>+((CONFIG.totalPagu*(CONFIG.targetBulan/100)/(12))*(i+1)/1e9).toFixed(1));
 
