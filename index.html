@@ -211,9 +211,9 @@ tbody tr:hover{background:#F4FAF9}
             <tr style="border-bottom:2px solid var(--border);text-align:left;color:var(--gray-500); font-family: 'Century Gothic', sans-serif;">
               <th style="padding-bottom:10px;font-weight:bold">Unit Kerja</th>
               <th style="padding-bottom:10px;font-weight:bold">Sumber Dana</th>
-              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Pagu</th>
-              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Realisasi</th>
-              <th style="padding-bottom:10px;font-weight:bold;text-align:right">OK</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Pagu (Juta)</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">Realisasi (Juta)</th>
+              <th style="padding-bottom:10px;font-weight:bold;text-align:right">OK (Juta)</th>
               <th style="padding-bottom:10px;font-weight:bold;text-align:right">% Pagu Efektif</th>
               <th style="padding-bottom:10px;font-weight:bold;text-align:right">% Efektif + OK</th>
             </tr>
@@ -367,22 +367,22 @@ const kpDetailData = [
     { sumber: 'RM', pagu: 34263384000, real: 9058157780, ok: 1580339222 },
     { sumber: 'CARE I', pagu: 7691928000, real: 116640000, ok: 609200000 }
   ]},
-  { unit: 'Dit PTM', rows: [
+  { unit: 'Penanggulangan Penyakit Tidak Menular', rows: [
     { sumber: 'RM', pagu: 395152000, real: 298365427, ok: 0 }
   ]},
   { unit: 'Imunisasi', rows: [
     { sumber: 'RM', pagu: 7533293000, real: 2040503439, ok: 339379926 }
   ]},
-  { unit: 'DIT PM', rows: [
+  { unit: 'Penanggulangan Penyakit Menular', rows: [
     { sumber: 'RM', pagu: 149047755000, real: 3449780700, ok: 1604928000 },
     { sumber: 'GF', pagu: 40233502000, real: 0, ok: 40209515760 },
     { sumber: 'CARE I', pagu: 7439901000, real: 0, ok: 0 }
   ]},
-  { unit: 'DIT SKK', rows: [
+  { unit: 'Surveilans, Kekarantinaan', rows: [
     { sumber: 'RM', pagu: 7211839000, real: 3852665545, ok: 0 },
     { sumber: 'CARE I', pagu: 19639168000, real: 0, ok: 0 }
   ]},
-  { unit: 'DIT KESLING', rows: [
+  { unit: 'Penyehatan Lingkungan', rows: [
     { sumber: 'RM', pagu: 48254910000, real: 22220862765, ok: 0 }
   ]},
   { unit: 'Care-I diluar Kemkes', rows: [
@@ -399,7 +399,7 @@ const timKerjaData = [
   { nama: 'Tim Kerja Dukungan Manajemen', pagu: 15865555000, real: 3271705804 },
   { nama: 'Tim Kerja Hibah', pagu: 101890000, real: 95843586 },
   { nama: 'Proyek Dukman GF', pagu: 17493733000, real: 4365937737 },
-  { nama: 'Proyek Care-I di Setditjen', pagu: 7691928000, real: 116640000 }
+  { nama: 'Proyek Care-I', pagu: 7691928000, real: 116640000 }
 ];
 
 const satkerData = [
@@ -540,7 +540,7 @@ document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
   </tr>`;
 }).join('');
 
-// Render Ulang Tabel Kantor Pusat (Nested Array) DENGAN FONT NORMAL UNTUK BARIS DETAIL
+// Render Ulang Tabel Kantor Pusat (Nested Array) DENGAN FONT NORMAL DAN DIBAGI 1 JUTA
 document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
   let html = '';
   let totalPagu = 0, totalReal = 0, totalOk = 0;
@@ -557,9 +557,9 @@ document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
     <tr style="font-family: 'Century Gothic', sans-serif; font-weight: normal; font-size: 13px; color: #1A1A1A; border-bottom: 1px solid #E0F5F4;">
       ${i === 0 ? `<td rowspan="${d.rows.length + 1}" style="border-right: 1px solid #D1EAE8; vertical-align: top; padding-top: 10px;">${index + 1}. ${d.unit}</td>` : ''}
       <td style="padding-left: 10px;">${r.sumber}</td>
-      <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.pagu.toLocaleString('id-ID')}</td>
-      <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.real.toLocaleString('id-ID')}</td>
-      <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.ok === 0 ? '-' : r.ok.toLocaleString('id-ID')}</td>
+      <td style="text-align:right; font-family: 'DM Mono', monospace;">${Math.round(r.pagu/1000000).toLocaleString('id-ID')}</td>
+      <td style="text-align:right; font-family: 'DM Mono', monospace;">${Math.round(r.real/1000000).toLocaleString('id-ID')}</td>
+      <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.ok === 0 ? '-' : Math.round(r.ok/1000000).toLocaleString('id-ID')}</td>
       <td style="text-align:right; color: ${colForPct(pctEfektif)}; font-weight: 500;">${pctEfektif}%</td>
       <td style="text-align:right; color: #007A75; font-weight: 500;">${pctTotal}%</td>
     </tr>`;
@@ -569,13 +569,13 @@ document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
   const pctTotalAll = totalPagu > 0 ? ((totalReal + totalOk) / totalPagu * 100).toFixed(2) : 0;
 
   html += `
-    <tr style="font-family: 'Century Gothic', sans-serif; font-size: 13px; font-weight: bold; background: #FEF3C7; color: #1A1A1A; border-bottom: 2px solid #D1EAE8;">
+    <tr style="font-family: 'Century Gothic', sans-serif; font-size: 13px; font-weight: normal; background: #FEF3C7; color: #1A1A1A; border-bottom: 2px solid #D1EAE8;">
       <td style="padding-left: 10px;">TOTAL</td>
-      <td style="text-align:right; font-family: 'DM Mono', monospace;">${totalPagu.toLocaleString('id-ID')}</td>
-      <td style="text-align:right; font-family: 'DM Mono', monospace;">${totalReal.toLocaleString('id-ID')}</td>
-      <td style="text-align:right; font-family: 'DM Mono', monospace;">${totalOk === 0 ? '-' : totalOk.toLocaleString('id-ID')}</td>
-      <td style="text-align:right; color: ${colForPct(pctTotalEfektif)};">${pctTotalEfektif}%</td>
-      <td style="text-align:right; color: #007A75;">${pctTotalAll}%</td>
+      <td style="text-align:right; font-family: 'DM Mono', monospace;">${Math.round(totalPagu/1000000).toLocaleString('id-ID')}</td>
+      <td style="text-align:right; font-family: 'DM Mono', monospace;">${Math.round(totalReal/1000000).toLocaleString('id-ID')}</td>
+      <td style="text-align:right; font-family: 'DM Mono', monospace;">${totalOk === 0 ? '-' : Math.round(totalOk/1000000).toLocaleString('id-ID')}</td>
+      <td style="text-align:right; color: ${colForPct(pctTotalEfektif)}; font-weight: 500;">${pctTotalEfektif}%</td>
+      <td style="text-align:right; color: #007A75; font-weight: 500;">${pctTotalAll}%</td>
     </tr>`;
   return html;
 }).join('');
