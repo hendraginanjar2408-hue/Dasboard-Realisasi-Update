@@ -193,7 +193,7 @@ tbody tr:hover{background:#F4FAF9}
   <div class="hero">
     <div class="hero-badge">Ditjen Penanggulangan Penyakit &nbsp;·&nbsp; Kode 02405</div>
     <h1 class="hero-title">Dashboard Realisasi Anggaran TA 2026</h1>
-    <p class="hero-sub">Direktorat Jenderal Pencegahan dan Pengendalian Penyakit — Kementerian Kesehatan RI</p>
+    <p class="hero-sub">Direktorat Jenderal Penanggulangan Penyakit — Kementerian Kesehatan RI</p>
     <div class="hero-meta" id="heroMeta"></div>
   </div>
 
@@ -456,4 +456,175 @@ function tick(){
   const n=new Date();
   document.getElementById('clock').textContent=
     n.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'})+
-    '  '+n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-
+    '  '+n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+}
+tick(); setInterval(tick,1000);
+
+document.getElementById('ftDate').textContent=CONFIG.tanggalData;
+document.getElementById('heroMeta').innerHTML=[
+  `<span>Data per ${CONFIG.tanggalData}</span>`,
+  `<span>Revisi DIPA ke-${CONFIG.nomorRevisi}</span>`,
+  `<span>${CONFIG.jumlahSatker} Satker Seluruh Indonesia</span>`,
+  `<span>Sumber: ADK DIPA &amp; GL KAS SPAN</span>`
+].join('');
+
+const paguBersih = CONFIG.totalPagu - CONFIG.totalBlokir;
+const pctReal    = pct(CONFIG.totalReal, CONFIG.totalPagu);
+const pctBersih  = pct(CONFIG.totalReal, paguBersih);
+const deviasi    = (pctReal - CONFIG.targetBulan).toFixed(2);
+const sisa       = CONFIG.totalPagu - CONFIG.totalReal;
+
+document.getElementById('metricsRow').innerHTML=`
+<div class="mc mc-tq">
+  <div class="mc-label">Total Pagu DIPA</div>
+  <div class="mc-val">Rp ${fmtM(CONFIG.totalPagu)} M</div>
+  <div class="mc-sub">Blokir: Rp ${fmtM(CONFIG.totalBlokir)} M &nbsp;|&nbsp; Bersih: Rp ${fmtM(paguBersih)} M</div>
+</div>
+<div class="mc mc-gr">
+  <div class="mc-label">Total Realisasi</div>
+  <div class="mc-val">Rp ${fmtM(CONFIG.totalReal)} M</div>
+  <div class="mc-sub" style="color:var(--gr-dark)">${pctReal.toFixed(2)}% dari Pagu &nbsp;|&nbsp; ${pctBersih.toFixed(2)}% dari Pagu Bersih</div>
+</div>
+<div class="mc mc-am">
+  <div class="mc-label">Sisa Anggaran</div>
+  <div class="mc-val">Rp ${fmtM(sisa)} M</div>
+  <div class="mc-sub">${(100-pctReal).toFixed(2)}% belum terserap s/d ${CONFIG.tanggalData}</div>
+</div>
+<div class="mc mc-rd">
+  <div class="mc-label">Target s/d Bulan Ini</div>
+  <div class="mc-val">${CONFIG.targetBulan.toFixed(2)}%</div>
+  <div class="mc-sub" style="color:${deviasi>=0?'var(--gr-dark)':'var(--red)'}">Deviasi: ${deviasi>=0?'+':''}${deviasi} poin dari target</div>
+</div>`;
+
+const progColors = ['#00A19A','#6CC24A','#D97706'];
+document.getElementById('progRows').innerHTML = programData.map((p,i)=>{
+  const pc = pct(p.real,p.pagu);
+  const col= pc>=35?progColors[0]:pc>=25?progColors[1]:progColors[2];
+  return `<div class="prog">
+    <div class="prog-head">
+      <span class="prog-name">${p.nama} <span class="prog-code">${p.kode}</span></span>
+      <span class="prog-pct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</span>
+    </div>
+    <div class="prog-amt">Realisasi Rp ${fmtM(p.real)} M &nbsp;/&nbsp; Pagu Rp ${fmtM(p.pagu)} M</div>
+    <div class="pbar"><div class="pfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div>
+  </div>`;
+}).join('');
+
+document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
+  const pc  = pct(d.real,d.pagu);
+  const col = colForPct(pc);
+  return `<tr>
+    <td class="jname">${d.nama}</td>
+    <td class="jnum">${fmtM(d.pagu)}</td>
+    <td class="jreal" style="color:${col}">${fmtM(d.real)}</td>
+    <td class="jbar"><div class="mbar"><div class="mfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div></td>
+  </tr>`;
+}).join('');
+
+// RENDER TABEL KANTOR PUSAT
+document.getElementById('tBodyKp').innerHTML = kpData.map(d => {
+  const p = pct(d.real, d.pagu);
+  return `<tr>
+    <td class="jname">${d.nama}</td>
+    <td class="jnum">${fmtJt(d.pagu)}</td>
+    <td class="jnum">${fmtJt(d.real)}</td>
+    <td class="jnum">${fmtJt(d.ok)}</td>
+    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:600">${p.toFixed(2)}%</td>
+    <td style="min-width:80px">
+      <div class="mbar">
+        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
+      </div>
+    </td>
+  </tr>`;
+}).join('');
+
+// RENDER TABEL SETDITJEN
+document.getElementById('tBodyTim').innerHTML = timKerjaData.map(d => {
+  const p = pct(d.real, d.pagu);
+  return `<tr>
+    <td class="jname">${d.nama}</td>
+    <td class="jnum">${fmtJt(d.pagu)}</td>
+    <td class="jnum">${fmtJt(d.real)}</td>
+    <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:600">${p.toFixed(2)}%</td>
+    <td style="min-width:80px">
+      <div class="mbar">
+        <div class="mfill" style="width:${Math.min(p, 100)}%;background:${colForPct(p)}"></div>
+      </div>
+    </td>
+  </tr>`;
+}).join('');
+
+
+const totalPaguM = CONFIG.totalPagu / 1e9;
+const idealPer12 = bulananData.map((_,i)=>+((CONFIG.totalPagu*(CONFIG.targetBulan/100)/(12))*(i+1)/1e9).toFixed(1));
+
+new Chart(document.getElementById('cBulan'),{
+  data:{
+    labels: bulananData.map(d=>d.bln),
+    datasets:[
+      {type:'bar',  label:'Realisasi',data:bulananData.map(d=>+(d.real/1e9).toFixed(2)),
+       backgroundColor:'rgba(0,161,154,.72)',borderRadius:5,order:2},
+      {type:'line', label:'Target Ideal',data:idealPer12,
+       borderColor:'#D97706',borderDash:[6,4],borderWidth:2,
+       pointRadius:4,pointBackgroundColor:'#D97706',backgroundColor:'transparent',tension:.35,order:1}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': Rp '+c.parsed.y.toFixed(1)+' M'}}},
+    scales:{
+      x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
+      y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>'Rp '+v+' M'}}
+    }
+  }
+});
+
+const nonKum = bulananData.map((d,i)=>i===0?d.real:d.real-bulananData[i-1].real);
+const nonKumM = nonKum.map(v=>+(v/1e9).toFixed(2));
+const barColors=['#80D4D1','#33B8B3','#00A19A','#007A75','#005550','#004240','#003230'];
+new Chart(document.getElementById('cBulNon'),{
+  type:'bar',
+  data:{
+    labels:bulananData.map(d=>d.bln),
+    datasets:[{label:'Realisasi',data:nonKumM,
+      backgroundColor:bulananData.map((_,i)=>barColors[i]||'#007A75'),
+      borderRadius:5,borderWidth:0}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'Rp '+c.parsed.y.toFixed(1)+' M'}}},
+    scales:{
+      x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
+      y:{grid:{color:gc},ticks:{color:tc,font:{size:11},callback:v=>v+' M'}}
+    }
+  }
+});
+
+function renderTable(){
+  const fv=document.getElementById('fStatus').value;
+  const fs=document.getElementById('fSort').value;
+  let data=satkerData.map(d=>({...d,pct:pct(d.real,d.pagu)}));
+  if(fv!=='all') data=data.filter(d=>skeyPct(d.pct)===fv);
+  data.sort((a,b)=>fs==='desc'?b.pct-a.pct:a.pct-b.pct);
+
+  document.getElementById('tBody').innerHTML=data.map((d,i)=>`<tr>
+    <td class="trank">${i+1}</td>
+    <td class="tsatker">${d.nama}</td>
+    <td class="tnum">${fmtJt(d.pagu)}</td>
+    <td class="tnum">${fmtJt(d.real)}</td>
+    <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
+    <td style="min-width:80px"><div class="mbar"><div class="mfill" style="width:${Math.min(d.pct,100)}%;background:${colForPct(d.pct)}"></div></div></td>
+    <td>${badgePct(d.pct)}</td>
+  </tr>`).join('');
+
+  const baik=data.filter(d=>skeyPct(d.pct)==='baik').length;
+  const phat=data.filter(d=>skeyPct(d.pct)==='perhatian').length;
+  const rend=data.filter(d=>skeyPct(d.pct)==='rendah').length;
+  document.getElementById('sbadges').innerHTML=`
+    <span class="sb" style="background:var(--gr-pale);color:var(--gr-dark)">✅ Baik: ${baik}</span>
+    <span class="sb" style="background:var(--amber-pale);color:var(--amber)">⚠️ Perhatian: ${phat}</span>
+    <span class="sb" style="background:var(--red-pale);color:var(--red)">🔴 Rendah: ${rend}</span>
+    <span class="sb" style="background:var(--tq-pale);color:var(--tq-dark)">Total: ${data.length} satker</span>`;
+}
+renderTable();
+</script>
+</body>
+</html>
