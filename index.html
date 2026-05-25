@@ -236,6 +236,7 @@ tbody tr:hover{background:#F4FAF9}
               <th style="padding-bottom:10px;font-weight:600">Unit Kerja</th>
               <th style="padding-bottom:10px;font-weight:600;text-align:right">Pagu</th>
               <th style="padding-bottom:10px;font-weight:600;text-align:right">Realisasi</th>
+	      <th style="padding-bottom:10px;font-weight:600;text-align:right">OK</th>
               <th style="padding-bottom:10px;font-weight:600;text-align:center">%</th>
               <th style="padding-bottom:10px">Progress</th>
             </tr>
@@ -288,7 +289,7 @@ tbody tr:hover{background:#F4FAF9}
         <thead><tr>
           <th style="text-align:center">#</th>
           <th>Nama Satker</th>
-          <th>Pagu (Rp Juta)</th>
+          <th>Pagu Harian (Rp Juta)</th>
           <th>Realisasi (Rp Juta)</th>
           <th>Serapan</th>
           <th>Progress</th>
@@ -331,9 +332,9 @@ const bulananData = [
 
 // ── 3. DATA PER PROGRAM ──────────────────────────────────────
 const programData = [
-  { kode:'02405WA', nama:'Pengendalian Penyakit',   pagu: 780164470000, real: 279705553592 },
-  { kode:'02405DZ', nama:'Kekarantinaan Kesehatan', pagu: 221485830000, real:  49563062678 },
-  { kode:'02405DX', nama:'Dukungan Manajemen',      pagu: 197209702000, real:   5739886375 },
+  { kode:'02405WA', nama:'Pengendalian Penyakit Esselon I',   pagu: 780164470000, real: 279705553592 },
+  { kode:'02405DZ', nama:'Kekarantinaan Kesehatan Esselon I', pagu: 221485830000, real:  49563062678 },
+  { kode:'02405DX', nama:'Dukungan Manajemen Esselon I',      pagu: 197209702000, real:   5739886375 },
 ];
 
 // ── 4. DATA JENIS BELANJA ────────────────────────────────────
@@ -351,26 +352,81 @@ const jenisData = [
 
 // ── DATA TAMBAHAN: KANTOR PUSAT & TIM KERJA SETDITJEN ─────────
 const kpData = [
-  { nama: 'Setditjen P2', pagu: 50000000000, real: 25000000000 },
-  { nama: 'Direktorat P2PM', pagu: 80000000000, real: 45000000000 },
-  { nama: 'Direktorat P2PTM', pagu: 65000000000, real: 30000000000 },
-  { nama: 'Direktorat Surveilans & Karantina Kesehatan', pagu: 40000000000, real: 20000000000 },
-  { nama: 'Direktorat Penyehatan Lingkungan', pagu: 30000000000, real: 15000000000 }
+  { nama: 'Setditjen P2', pagu: 41955312000, real: 9174797780, OK: 2189539222 },
+  { nama: 'Direktorat PM', pagu: 196721158000, real: 3449780700, OK: 41814443760 },
+  { nama: 'Direktorat PTM', pagu: 395152000, real: 298365427, OK: 0 },
+  { nama: 'Direktorat Surveilans & Karantina Kesehatan', pagu: 26851007000, real: 3852665545, OK: 0 },
+  { nama: 'Direktorat Imunisasi', pagu: 7533293000, real: 2040503439, OK: 339379926 },
+  { nama: 'Direktorat Kesehatan Lingkungan', pagu: 30000000000, real: 15000000000, OK: 0 }
+  { nama: 'Proyek Care-I', pagu: 39462435000, real: 0, OK: 0 }
 ];
 
 const timKerjaData = [
-  { nama: 'Tim Kerja Keuangan & BMN', pagu: 15000000000, real: 8000000000 },
-  { nama: 'Tim Kerja Kepegawaian & Umum', pagu: 12000000000, real: 7000000000 },
-  { nama: 'Tim Kerja Perencanaan & Evaluasi', pagu: 8000000000, real: 4000000000 },
-  { nama: 'Tim Kerja Hukum, Humas & Organisasi', pagu: 5000000000, real: 2000000000 }
+  { nama: 'Tim Kerja Keuangan & BMN', pagu: 153214000, real: 131680800},
+  { nama: 'Tim Kerja OSDM', pagu: 109348000, real: 73190000 },
+  { nama: 'Tim Kerja Program & Anggaran', pagu: 256450000, real: 247585000 },
+  { nama: 'Tim Kerja Hukmas', pagu: 153620000, real: 106713000 }
+  { nama: 'Tim Kerja Marvel', pagu: 129574000, real: 107702000 }
+  { nama: 'Tim Kerja Dukungan Manajemen', pagu: 15865555000, real: 3271705804 }
+  { nama: 'Tim Kerja Hibah', pagu: 101890000, real: 95843586 }
+  { nama: 'Proyek Dukman GF', pagu: 17493733000, real: 4365937737 }
+  { nama: 'Proyek Care-I', pagu: 7691928000, real: 8516997927, OK: 609200000 }
 ];
 
 // ── 5. DATA SATKER ───────────────────────────────────────────
 const satkerData = [
-  { nama:'BKK Kelas I Manado', pagu: 11598953000, real: 5606759856 },
-  { nama:'LKK Labuan Bajo', pagu: 6192536000, real: 2537455391 },
-  { nama:'BKK Kelas II Lhokseumawe', pagu: 11064570000, real: 4476024308 },
-  { nama:'Kantor Pusat Ditjen P2', pagu: 361173267000, real: 40140627565 },
+  { nama:'BKK Kelas I Manado',                        pagu:  11598953000, real:  5606759856 },
+  { nama:'LKK Labuan Bajo',                           pagu:   6192536000, real:  2537455391 },
+  { nama:'BKK Kelas II Lhokseumawe',                  pagu:  11064570000, real:  4476024308 },
+  { nama:'BKK Kelas II Bitung',                       pagu:   9189053000, real:  3713198482 },
+  { nama:'BKK Kelas I Gorontalo',                     pagu:  12463483000, real:  5027103308 },
+  { nama:'BKK Kelas I Kupang',                        pagu:  13879313000, real:  5559962317 },
+  { nama:'BKK Kelas I Jayapura',                      pagu:  13436838000, real:  5225115385 },
+  { nama:'BKK Kelas I Balikpapan',                    pagu:  19551486000, real:  7592083229 },
+  { nama:'BKK Kelas II Tembilahan',                   pagu:   9739338000, real:  3769743188 },
+  { nama:'BKK Kelas I Mataram',                       pagu:  18682276000, real:  7232576608 },
+  { nama:'BKK Kelas II Bengkulu',                     pagu:  12609360000, real:  4802046892 },
+  { nama:'BKK Kelas I Panjang',                       pagu:  17702720000, real:  6721868185 },
+  { nama:'BKK Kelas I Banda Aceh',                    pagu:  21140207000, real:  7978903423 },
+  { nama:'BKK Kelas II Manokwari',                    pagu:   9190173000, real:  3414826625 },
+  { nama:'BBKK Medan',                                pagu:  24507016000, real:  9091301183 },
+  { nama:'BKK Kelas I Tanjung Pinang',                pagu:  15262311000, real:  5634611917 },
+  { nama:'BKK Kelas II Sampit',                       pagu:   8270838000, real:  3043078072 },
+  { nama:'BKK Kelas I Cilacap',                       pagu:  13659510000, real:  4988105181 },
+  { nama:'BKK Kelas I Semarang',                      pagu:  23242606000, real:  8432468372 },
+  { nama:'BBKK Tanjung Priok',                        pagu:  35101092000, real: 12719403681 },
+  { nama:'BKK Kelas II Pangkal Pinang',               pagu:  14118856000, real:  5109808651 },
+  { nama:'BKK Kelas I Pekanbaru',                     pagu:  16841028000, real:  6080171938 },
+  { nama:'LKK Entikong',                              pagu:   7222905000, real:  2596086080 },
+  { nama:'BBKK Denpasar',                             pagu:  24879077000, real:  8939069202 },
+  { nama:'BKK Kelas II Merauke',                      pagu:   8146288000, real:  2908488366 },
+  { nama:'BKK Kelas I Banjarmasin',                   pagu:  22868481000, real:  8078326520 },
+  { nama:'BKK Kelas II Palu',                         pagu:  10680487000, real:  3765972396 },
+  { nama:'BKK Kelas II Sabang',                       pagu:   7287180000, real:  2564268948 },
+  { nama:'BKK Kelas I Bandung',                       pagu:  26588773000, real:  9330098274 },
+  { nama:'BKK Kelas I Kendari',                       pagu:  16564783000, real:  5792135800 },
+  { nama:'BKK Kelas I Dumai',                         pagu:  13627006000, real:  4751591073 },
+  { nama:'BKK Kelas II Palangkaraya',                 pagu:  10927111000, real:  3794675267 },
+  { nama:'BKK Kelas II Yogyakarta',                   pagu:  11385260000, real:  3932461301 },
+  { nama:'BKK Kelas I Tanjung Balai Karimun',         pagu:  11363557000, real:  3925414586 },
+  { nama:'BKK Kelas I Palembang',                     pagu:  18332808000, real:  6282515103 },
+  { nama:'BKK Kelas II Jambi',                        pagu:  14153240000, real:  4843686329 },
+  { nama:'BKK Kelas I Pontianak',                     pagu:  14195770000, real:  4831926810 },
+  { nama:'BKK Kelas I Tarakan',                       pagu:  15074295000, real:  5107290383 },
+  { nama:'BKK Kelas I Probolinggo',                   pagu:  18060843000, real:  6106512577 },
+  { nama:'BKK Kelas II Biak',                         pagu:   8889726000, real:  3000489720 },
+  { nama:'BBKK Makassar',                             pagu:  30499685000, real: 10280781677 },
+  { nama:'BKK Kelas II Sorong',                       pagu:  12007083000, real:  4017548344 },
+  { nama:'BKK Kelas I Banten',                        pagu:  18726019000, real:  6248323876 },
+  { nama:'BKK Kelas II Poso',                         pagu:  10978601000, real:  3624915403 },
+  { nama:'BKK Kelas I Ambon',                         pagu:  12284037000, real:  3958468343 },
+  { nama:'BKK Kelas I Padang',                        pagu:  15367065000, real:  4927008205 },
+  { nama:'BKK Kelas I Samarinda',                     pagu:  18891417000, real:  6046046344 },
+  { nama:'BBKK Batam',                                pagu:  26313381000, real:  8403709116 },
+  { nama:'BBKK Soekarno Hatta',                       pagu:  34941668000, real: 10788361410 },
+  { nama:'BBKK Surabaya',                             pagu:  45716260000, real: 13167287108 },
+  { nama:'BKK Kelas I Ternate',                       pagu:  14270366000, real:  4097800327 },
+  { nama:'Kantor Pusat Ditjen P2',                    pagu: 361173267000, real: 40140627565 },
 ];
 
 // ── RENDERING ENGINE ─────────────────────────────────────────
@@ -464,6 +520,7 @@ document.getElementById('tBodyKp').innerHTML = kpData.map(d => {
     <td class="jname">${d.nama}</td>
     <td class="jnum">${fmtJt(d.pagu)}</td>
     <td class="jnum">${fmtJt(d.real)}</td>
+    <td class="jnum">${fmtJt(d.ok)}</td>
     <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:600">${p.toFixed(2)}%</td>
     <td style="min-width:80px">
       <div class="mbar">
