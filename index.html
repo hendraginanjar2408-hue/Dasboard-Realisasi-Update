@@ -399,7 +399,7 @@ const timKerjaData = [
   { nama: 'Tim Kerja Dukungan Manajemen', pagu: 15865555000, real: 3271705804 },
   { nama: 'Tim Kerja Hibah', pagu: 101890000, real: 95843586 },
   { nama: 'Proyek Dukman GF', pagu: 17493733000, real: 4365937737 },
-  { nama: 'Proyek Care-I di Setditjen P2', pagu: 7691928000, real: 116640000 }
+  { nama: 'Proyek Care-I', pagu: 7691928000, real: 116640000 }
 ];
 
 const satkerData = [
@@ -540,7 +540,7 @@ document.getElementById('jenisTbody').innerHTML = jenisData.map(d=>{
   </tr>`;
 }).join('');
 
-// Render Ulang Tabel Kantor Pusat (Nested Array)
+// Render Ulang Tabel Kantor Pusat (Nested Array) DENGAN FONT NORMAL UNTUK BARIS DETAIL
 document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
   let html = '';
   let totalPagu = 0, totalReal = 0, totalOk = 0;
@@ -554,14 +554,14 @@ document.getElementById('tBodyKp').innerHTML = kpDetailData.map((d, index) => {
     const pctTotal = r.pagu > 0 ? ((r.real + r.ok) / r.pagu * 100).toFixed(2) : 0;
     
     html += `
-    <tr style="font-family: 'Century Gothic', sans-serif; font-weight: bold; font-size: 13px; color: #1A1A1A; border-bottom: 1px solid #E0F5F4;">
+    <tr style="font-family: 'Century Gothic', sans-serif; font-weight: normal; font-size: 13px; color: #1A1A1A; border-bottom: 1px solid #E0F5F4;">
       ${i === 0 ? `<td rowspan="${d.rows.length + 1}" style="border-right: 1px solid #D1EAE8; vertical-align: top; padding-top: 10px;">${index + 1}. ${d.unit}</td>` : ''}
       <td style="padding-left: 10px;">${r.sumber}</td>
       <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.pagu.toLocaleString('id-ID')}</td>
       <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.real.toLocaleString('id-ID')}</td>
       <td style="text-align:right; font-family: 'DM Mono', monospace;">${r.ok === 0 ? '-' : r.ok.toLocaleString('id-ID')}</td>
-      <td style="text-align:right; color: ${colForPct(pctEfektif)};">${pctEfektif}%</td>
-      <td style="text-align:right; color: #007A75;">${pctTotal}%</td>
+      <td style="text-align:right; color: ${colForPct(pctEfektif)}; font-weight: 500;">${pctEfektif}%</td>
+      <td style="text-align:right; color: #007A75; font-weight: 500;">${pctTotal}%</td>
     </tr>`;
   });
 
@@ -637,7 +637,6 @@ new Chart(document.getElementById('cBulNon'),{
   }
 });
 
-// --- DATA & RENDER TAMBAHAN: KEWENANGAN & SUMBER DANA ---
 const kpPagu = 361173267000;
 const kpReal = 40140627565;
 const kdPagu = CONFIG.totalPagu - kpPagu;
@@ -658,9 +657,9 @@ const sumberDanaData = [
 document.getElementById('tBodyKewenangan').innerHTML = kewenanganData.map(d => {
   const p = pct(d.real, d.pagu);
   return `<tr>
-    <td class="jname" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${d.nama}</td>
-    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.pagu)}</td>
-    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.real)}</td>
+    <td class="jname" style="font-family: 'Century Gothic', sans-serif;">${d.nama}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif;">${fmtJt(d.pagu)}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif;">${fmtJt(d.real)}</td>
     <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:bold;font-family:'Century Gothic', sans-serif;">${p.toFixed(2)}%</td>
     <td style="min-width:80px">
       <div class="mbar">
@@ -673,9 +672,9 @@ document.getElementById('tBodyKewenangan').innerHTML = kewenanganData.map(d => {
 document.getElementById('tBodySumberDana').innerHTML = sumberDanaData.map(d => {
   const p = pct(d.real, d.pagu);
   return `<tr>
-    <td class="jname" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${d.nama}</td>
-    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.pagu)}</td>
-    <td class="jnum" style="font-family: 'Century Gothic', sans-serif; font-weight: bold;">${fmtJt(d.real)}</td>
+    <td class="jname" style="font-family: 'Century Gothic', sans-serif;">${d.nama}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif;">${fmtJt(d.pagu)}</td>
+    <td class="jnum" style="font-family: 'Century Gothic', sans-serif;">${fmtJt(d.real)}</td>
     <td class="jnum" style="color:${colForPct(p)};text-align:center;font-weight:bold;font-family:'Century Gothic', sans-serif;">${p.toFixed(2)}%</td>
     <td style="min-width:80px">
       <div class="mbar">
@@ -684,7 +683,6 @@ document.getElementById('tBodySumberDana').innerHTML = sumberDanaData.map(d => {
     </td>
   </tr>`;
 }).join('');
-// --- BATAS DATA TAMBAHAN ---
 
 function renderTable(){
   const fv=document.getElementById('fStatus').value;
