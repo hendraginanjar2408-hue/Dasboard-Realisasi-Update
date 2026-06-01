@@ -21,21 +21,22 @@
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);font-weight:bold;background:var(--tq-bg);color:var(--gray-900);font-size:14px;line-height:1.6;min-height:100vh}
+body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-size:14px;line-height:1.6;min-height:100vh}
 
-th, td, input, select, button, .mc-label, .ct, .prog-name { font-weight: bold; }
+/* Mengatur elemen utama agar tebal, tapi membiarkan isi tabel normal */
+th, .mc-label, .mc-val, .ct, .prog-name, .tb-org { font-weight: bold; }
 
-/* TOP BAR & HERO */
-.topbar{background:var(--tq-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,161,154,.25)}
+/* TOP BAR (Diperbarui ke versi putih bersih) */
+.topbar{background:#ffffff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .tb-left{display:flex;align-items:center;gap:12px}
-.tb-org{font-size:13px;letter-spacing:.04em;opacity:.9;border-right:1px solid rgba(255,255,255,.25);padding-right:12px}
-.tb-title{font-size:13px;opacity:.85}
-.tb-right{font-family:var(--mono);font-size:12px;opacity:.85;white-space:nowrap}
+.tb-org{font-size:14px;color:var(--tq-dark);letter-spacing:.02em;border-right:1px solid #ddd;padding-right:12px}
+.tb-title{font-size:13px;color:var(--gray-700)}
+.tb-right{font-family:var(--mono);font-size:12px;color:var(--gray-500);white-space:nowrap}
 
 .wrap{max-width:1200px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
 .hero{background:linear-gradient(135deg,var(--tq-dark) 0%,var(--tq) 55%,#00c4bc 100%);border-radius:var(--rl);padding:2rem 2.5rem;color:#fff;margin-bottom:1.5rem;position:relative;overflow:hidden}
 .hero-badge{display:inline-block;background:rgba(108,194,74,.25);color:#c7f0b5;font-size:11px;padding:4px 12px;border-radius:999px;margin-bottom:10px;border:1px solid rgba(108,194,74,.35)}
-.hero-title{font-size:24px;margin-bottom:6px;line-height:1.3}
+.hero-title{font-size:24px;margin-bottom:6px;line-height:1.3;font-weight:bold;}
 .hero-sub{font-size:14px;opacity:.9;margin-bottom:1.5rem}
 .hero-meta{display:flex;gap:1.25rem;flex-wrap:wrap}
 .hero-meta span{font-size:13px;opacity:.9;display:flex;align-items:center;gap:5px}
@@ -59,21 +60,21 @@ th, td, input, select, button, .mc-label, .ct, .prog-name { font-weight: bold; }
 /* PROG & BARS */
 .prog{margin-bottom:15px}
 .prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
-.prog-name{font-size:14px}
-.prog-pct{font-family:var(--mono);font-size:14px}
+.prog-name{font-size:14px;font-weight:normal;}
+.prog-pct{font-family:var(--mono);font-size:14px;font-weight:bold;}
 .prog-amt{font-size:12px;color:var(--gray-500);margin-bottom:4px}
 .pbar{width:100%;background:var(--gray-100);border-radius:4px;height:8px}
 .pfill{height:8px;border-radius:4px}
 
-/* TABLES */
+/* TABLES (Penyesuaian Ketebalan Huruf) */
 .tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}
 thead th{background:#F0F9F9;padding:10px 12px;text-align:left;font-size:12px;color:var(--gray-700);text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
-tbody td{padding:10px 12px;border-bottom:1px solid #F4FAF9;color:var(--gray-900)}
-tbody tr:hover{background:#E0F5F4}
+tbody td{padding:10px 12px;border-bottom:1px solid #F4FAF9;color:var(--gray-900);font-weight:normal;} /* <-- Normal weight untuk isi tabel */
+tbody tr:hover{background:#F4FAF9}
 .tnum, .tpct, .tr{font-family:var(--mono);text-align:right}
 .tnum{font-size:13px}
-.tpct{font-size:13px}
+.tpct{font-size:13px;font-weight:bold;}
 
 /* J-TABLE (Jenis Belanja) */
 .jtbl{min-width:100%}
@@ -95,13 +96,13 @@ tbody tr:hover{background:#E0F5F4}
 <body>
 
 <div id="loadingOverlay">
-  Memuat Data dari Google Spreadsheet...<br>
-  <span style="font-size:14px;color:#777;margin-top:10px">Harap tunggu sebentar</span>
+  Menunggu Gaji ke 13....<br>
+  <span style="font-size:14px;color:#777;margin-top:10px;font-weight:normal;">Harap tunggu sebentar</span>
 </div>
 
 <nav class="topbar">
   <div class="tb-left">
-    <img src="https://kemkes.go.id/app_asset/image_content_download/170608421265b0c77488c048.52529672.png" alt="Logo Kemenkes" style="height: 40px; width: auto; object-fit: contain;">
+    <img src="https://kemkes.go.id/app_asset/image_content_download/170608421265b0c77488c048.52529672.png" alt="Logo Kemenkes" style="height: 36px; width: auto; object-fit: contain;">
     <span class="tb-org">KEMKES RI</span>
     <span class="tb-title">Ditjen Penanggulangan Penyakit</span>
   </div>
@@ -220,7 +221,7 @@ tbody tr:hover{background:#E0F5F4}
         <tbody id="tBody"></tbody>
       </table>
     </div>
-    <p style="font-size:12px;color:var(--gray-500);margin-top:10px">
+    <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
       * Parameter Status: ✅ <strong>Baik</strong> (≥35%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (25–34%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;25%)
     </p>
   </div>
@@ -291,7 +292,7 @@ async function sinkronisasiData() {
     console.error("Gagal sinkronisasi:", error);
     document.getElementById('loadingOverlay').innerHTML = `
       <div style="text-align:center; padding: 20px;">
-        <span style='color:red; font-size:20px;'>Gagal Memuat Data Dashboard</span><br><br>
+        <span style='color:red; font-size:20px; font-weight:bold;'>Gagal Memuat Data Dashboard</span><br><br>
         <span style='color:#444; font-size:14px;'>${error.message}</span>
       </div>`;
   }
@@ -339,20 +340,20 @@ function initDashboard() {
       <div class="prog-amt">Real: Rp ${fmtM(p.real)} M / Pagu: Rp ${fmtM(p.pagu)} M</div>
       <div class="pbar"><div class="pfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div>
     </div>`;
-  }).join('') || '<p style="font-size:12px;color:#999">Belum ada data program.</p>';
+  }).join('') || '<p style="font-size:12px;color:#999;font-weight:normal;">Belum ada data program.</p>';
 
   if(jenisData.length > 0) {
     document.getElementById('jenisTbody').innerHTML = jenisData.map(d => {
       const pc = pct(d.real, d.pagu); const col = colForPct(pc);
       return `<tr>
-        <td class="prog-name">${d.nama||'-'}</td>
+        <td>${d.nama||'-'}</td>
         <td class="tnum">${fmtM(d.pagu)}</td>
-        <td class="tnum" style="color:${col}">${fmtM(d.real)}</td>
+        <td class="tnum" style="color:${col}; font-weight:bold;">${fmtM(d.real)}</td>
         <td class="jbar"><div class="mbar"><div class="mfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div></td>
       </tr>`;
     }).join('');
   } else {
-    document.getElementById('jenisTbody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999">Belum ada data jenis belanja.</td></tr>';
+    document.getElementById('jenisTbody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;font-weight:normal;">Belum ada data jenis belanja.</td></tr>';
   }
 
   if(kewenanganData.length > 0) {
@@ -398,17 +399,17 @@ function initDashboard() {
         subReal += rl;
         
         htmlKPDetail += `<tr>
-          <td class="prog-name">${d.unit_kerja||'-'}</td>
+          <td>${d.unit_kerja||'-'}</td>
           <td>${d.sumber_dana||'-'}</td>
           <td class="tnum">${fmtM(pg)}</td>
-          <td class="tnum" style="color:var(--gr-dark)">${fmtM(rl)}</td>
+          <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtM(rl)}</td>
           <td class="tpct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</td>
         </tr>`;
       });
       
       const subPc = pct(subReal, subPagu);
       htmlKPDetail += `<tr style="background: var(--tq-pale); border-bottom: 2px solid var(--tq-light);">
-        <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase;">↳ TOTAL SUB-UNIT: ${unit}</td>
+        <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase; font-weight:bold;">↳ TOTAL SUB-UNIT: ${unit}</td>
         <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(subPagu)}</td>
         <td class="tnum" style="color:var(--gr-dark); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(subReal)}</td>
         <td class="tpct" style="color:${colForPct(subPc)}; border-top: 1px solid var(--tq-light); font-weight: bold;">${subPc.toFixed(2)}%</td>
@@ -416,23 +417,23 @@ function initDashboard() {
     }
     document.getElementById('tBodyKPDetail').innerHTML = htmlKPDetail;
   } else {
-    document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999">Belum ada data detail Kantor Pusat.</td></tr>';
+    document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data detail Kantor Pusat.</td></tr>';
   }
 
   if(timKerjaData.length > 0) {
     document.getElementById('tBodyTimKerja').innerHTML = timKerjaData.map(d => {
       let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
       return `<tr>
-        <td class="prog-name">${d.nama||'-'}</td>
+        <td>${d.nama||'-'}</td>
         <td class="tnum" style="background:#F4FAF9;">${fmtM(pg)}</td>
         <td class="tnum" style="color:var(--red)">${fmtM(blk)}</td>
-        <td class="tnum" style="color:var(--gr-dark)">${fmtM(rl)}</td>
+        <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtM(rl)}</td>
         <td class="tnum" style="color:var(--amber)">${fmtM(ok)}</td>
         <td class="tpct" style="color:${colForPct(pcUtuh)}">${pcUtuh.toFixed(2)}%</td>
       </tr>`;
     }).join('');
   } else {
-    document.getElementById('tBodyTimKerja').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999">Belum ada data Tim Kerja.</td></tr>';
+    document.getElementById('tBodyTimKerja').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;font-weight:normal;">Belum ada data Tim Kerja.</td></tr>';
   }
 
   let kumulatifArr = [], nonKumulatifArr = [], currentSum = 0;
@@ -492,16 +493,16 @@ function initDashboard() {
     data.sort((a,b) => b.pct - a.pct);
 
     if (data.length === 0) {
-        document.getElementById('tBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">Tidak ada data Satker.</td></tr>';
+        document.getElementById('tBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;font-weight:normal;">Tidak ada data Satker.</td></tr>';
         return;
     }
 
     document.getElementById('tBody').innerHTML = data.map((d,i) => `<tr>
       <td style="text-align:center;color:#999" class="tnum">${i+1}</td>
-      <td class="prog-name">${d.nama||'-'}</td>
+      <td>${d.nama||'-'}</td>
       <td class="tnum" style="background:#F4FAF9">${fmtJt(d.pg)}</td>
       <td class="tnum" style="color:var(--red)">${fmtJt(d.blk)}</td>
-      <td class="tnum" style="color:var(--gr-dark)">${fmtJt(d.rl)}</td>
+      <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(d.rl)}</td>
       <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
       <td style="text-align:center">${badgePct(d.pct)}</td>
     </tr>`).join('');
