@@ -26,7 +26,7 @@ body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-
 /* Mengatur elemen utama agar tebal, tapi membiarkan isi tabel normal */
 th, .mc-label, .mc-val, .ct, .prog-name, .tb-org { font-weight: bold; }
 
-/* TOP BAR (Diperbarui ke versi putih bersih) */
+/* TOP BAR */
 .topbar{background:#ffffff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .tb-left{display:flex;align-items:center;gap:12px}
 .tb-org{font-size:14px;color:var(--tq-dark);letter-spacing:.02em;border-right:1px solid #ddd;padding-right:12px}
@@ -96,8 +96,8 @@ tbody tr:hover{background:#F4FAF9}
 <body>
 
 <div id="loadingOverlay">
-  Mengirim Gaji Ke 13......<br>
-  <span style="font-size:14px;color:#777;margin-top:10px;font-weight:normal;">Harap tunggu sebentar</span>
+  Mengirim Gaji ke 13....<br>
+  <span style="font-size:36px;color:#777;margin-top:10px;font-weight:normal;">Harap tunggu sebentar</span>
 </div>
 
 <nav class="topbar">
@@ -343,7 +343,6 @@ function initDashboard() {
     </div>`;
   }).join('') || '<p style="font-size:12px;color:#999;font-weight:normal;">Belum ada data program.</p>';
 
-  // PENAMBAHAN KOLOM PERSENTASE DI JENIS BELANJA
   if(jenisData.length > 0) {
     document.getElementById('jenisTbody').innerHTML = jenisData.map(d => {
       const pc = pct(d.real, d.pagu); const col = colForPct(pc);
@@ -381,7 +380,7 @@ function initDashboard() {
     }).join('');
   }
 
-  // PENGURUTAN DETAIL KANTOR PUSAT BERDASARKAN TOTAL REALISASI
+  // PENGURUTAN DETAIL KANTOR PUSAT BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
   if(kpDetailDanaData.length > 0) {
     const groupsObj = {};
     kpDetailDanaData.forEach(d => {
@@ -394,13 +393,13 @@ function initDashboard() {
       groupsObj[unit].subReal += Number(d.real) || 0;
     });
     
-    // Ubah Objek menjadi Array dan urutkan berdasarkan Total Realisasi (Highest to Lowest)
     const sortedGroupsArr = Object.keys(groupsObj).map(unit => ({
       unitName: unit,
       items: groupsObj[unit].items,
       subPagu: groupsObj[unit].subPagu,
-      subReal: groupsObj[unit].subReal
-    })).sort((a, b) => b.subReal - a.subReal);
+      subReal: groupsObj[unit].subReal,
+      subPct: pct(groupsObj[unit].subReal, groupsObj[unit].subPagu) // Hitung persentase sub-unit
+    })).sort((a, b) => b.subPct - a.subPct); // Urutkan berdasarkan persentase
     
     let htmlKPDetail = '';
     sortedGroupsArr.forEach(group => {
@@ -418,12 +417,11 @@ function initDashboard() {
         </tr>`;
       });
       
-      const subPc = pct(group.subReal, group.subPagu);
       htmlKPDetail += `<tr style="background: var(--tq-pale); border-bottom: 2px solid var(--tq-light);">
         <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase; font-weight:bold;">↳ TOTAL SUB-UNIT: ${group.unitName}</td>
         <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subPagu)}</td>
         <td class="tnum" style="color:var(--gr-dark); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subReal)}</td>
-        <td class="tpct" style="color:${colForPct(subPc)}; border-top: 1px solid var(--tq-light); font-weight: bold;">${subPc.toFixed(2)}%</td>
+        <td class="tpct" style="color:${colForPct(group.subPct)}; border-top: 1px solid var(--tq-light); font-weight: bold;">${group.subPct.toFixed(2)}%</td>
       </tr>`;
     });
     document.getElementById('tBodyKPDetail').innerHTML = htmlKPDetail;
@@ -431,9 +429,13 @@ function initDashboard() {
     document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data detail Kantor Pusat.</td></tr>';
   }
 
-  // PENGURUTAN TIM KERJA BERDASARKAN REALISASI TERTINGGI
+  // PENGURUTAN TIM KERJA BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
   if(timKerjaData.length > 0) {
-    const sortedTimKerjaData = [...timKerjaData].sort((a, b) => (Number(b.real) || 0) - (Number(a.real) || 0));
+    const sortedTimKerjaData = [...timKerjaData].sort((a, b) => {
+      let pctA = pct(Number(a.real) || 0, Number(a.pagu) || 0);
+      let pctB = pct(Number(b.real) || 0, Number(b.pagu) || 0);
+      return pctB - pctA;
+    });
 
     document.getElementById('tBodyTimKerja').innerHTML = sortedTimKerjaData.map(d => {
       let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
