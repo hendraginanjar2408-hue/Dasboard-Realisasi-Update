@@ -23,7 +23,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);font-weight:bold;background:var(--tq-bg);color:var(--gray-900);font-size:14px;line-height:1.6;min-height:100vh}
 
-/* Mengamankan elemen agar mewarisi cetak tebal */
 th, td, input, select, button, .mc-label, .ct, .prog-name { font-weight: bold; }
 
 /* TOP BAR & HERO */
@@ -96,7 +95,7 @@ tbody tr:hover{background:#E0F5F4}
 <body>
 
 <div id="loadingOverlay">
-  Memuat Data dari Google Spreadsheet...<br>
+  Mohon sabar Menunggu Gaji ke 13...<br>
   <span style="font-size:14px;color:#777;margin-top:10px">Harap tunggu sebentar</span>
 </div>
 
@@ -259,13 +258,12 @@ async function sinkronisasiData() {
     const response = await fetch(SPREADSHEET_API_URL);
     const textData = await response.text();
     
-    // PENGECEKAN DEFENSIVE: Memastikan API tidak mengembalikan HTML Login
     if (textData.trim().startsWith('<')) {
       throw new Error("API terblokir. Pastikan Google Apps Script di-deploy dengan akses 'Anyone' (Siapa saja).");
     }
 
     const data = JSON.parse(textData);
-    const configData = data.config || {}; // Mencegah TypeError jika config hilang
+    const configData = data.config || {};
 
     CONFIG = {
       tanggalData: configData.tanggalData || '-',
@@ -378,17 +376,45 @@ function initDashboard() {
     }).join('');
   }
 
+  /* LOGIKA UPDATE: Pengelompokan dan Pembuatan Subtotal Unit Kerja Kantor Pusat */
   if(kpDetailDanaData.length > 0) {
-    document.getElementById('tBodyKPDetail').innerHTML = kpDetailDanaData.map(d => {
-      let pg = Number(d.pagu)||0, rl = Number(d.real)||0, pc = pct(rl, pg);
-      return `<tr>
-        <td class="prog-name">${d.unit_kerja||'-'}</td>
-        <td>${d.sumber_dana||'-'}</td>
-        <td class="tnum">${fmtM(pg)}</td>
-        <td class="tnum" style="color:var(--gr-dark)">${fmtM(rl)}</td>
-        <td class="tpct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</td>
+    const groups = {};
+    kpDetailDanaData.forEach(d => {
+      const unit = d.unit_kerja || 'Tanpa Nama Unit';
+      if (!groups[unit]) groups[unit] = [];
+      groups[unit].push(d);
+    });
+    
+    let htmlKPDetail = '';
+    for (const unit in groups) {
+      let subPagu = 0;
+      let subReal = 0;
+      
+      groups[unit].forEach(d => {
+        const pg = Number(d.pagu)||0;
+        const rl = Number(d.real)||0;
+        const pc = pct(rl, pg);
+        subPagu += pg;
+        subReal += rl;
+        
+        htmlKPDetail += `<tr>
+          <td class="prog-name">${d.unit_kerja||'-'}</td>
+          <td>${d.sumber_dana||'-'}</td>
+          <td class="tnum">${fmtM(pg)}</td>
+          <td class="tnum" style="color:var(--gr-dark)">${fmtM(rl)}</td>
+          <td class="tpct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</td>
+        </tr>`;
+      });
+      
+      const subPc = pct(subReal, subPagu);
+      htmlKPDetail += `<tr style="background: var(--tq-pale); border-bottom: 2px solid var(--tq-light);">
+        <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase;">↳ TOTAL SUB-UNIT: ${unit}</td>
+        <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(subPagu)}</td>
+        <td class="tnum" style="color:var(--gr-dark); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(subReal)}</td>
+        <td class="tpct" style="color:${colForPct(subPc)}; border-top: 1px solid var(--tq-light); font-weight: bold;">${subPc.toFixed(2)}%</td>
       </tr>`;
-    }).join('');
+    }
+    document.getElementById('tBodyKPDetail').innerHTML = htmlKPDetail;
   } else {
     document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999">Belum ada data detail Kantor Pusat.</td></tr>';
   }
