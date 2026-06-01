@@ -7,75 +7,508 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-:root{ --tq:#00A19A; --tq-dark:#007A75; --gr:#6CC24A; --gr-dark:#4E9934; --amber:#D97706; --red:#B91C1C; --tq-bg:#F4FAF9; --gray-500:#777; --border:#D1EAE8; --font:'Plus Jakarta Sans',sans-serif; --mono:'DM Mono',monospace; }
+:root{
+  --tq:       #00A19A; --tq-dark:  #007A75; --tq-mid:   #33B8B3; --tq-light: #80D4D1; --tq-pale:  #E0F5F4; --tq-bg:    #F4FAF9;
+  --gr:       #6CC24A; --gr-dark:  #4E9934; --gr-mid:   #8FD66E; --gr-pale:  #EAF7E4;
+  --amber:    #D97706; --amber-pale:#FEF3C7;
+  --red:      #B91C1C; --red-pale: #FEE2E2;
+  --gray-900: #1A1A1A; --gray-700: #444444; --gray-500: #777777; --gray-300: #CCCCCC; --gray-100: #F5F5F3;
+  --white:    #FFFFFF; --border:   #D1EAE8;
+  --font: 'Plus Jakarta Sans', sans-serif; --mono: 'DM Mono', monospace;
+  --r:    10px; --rl:   14px;
+}
+
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--tq-bg);color:#1A1A1A;font-size:14px;line-height:1.6;min-height:100vh}
-.topbar{background:var(--tq-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100}
+body{font-family:var(--font);background:var(--tq-bg);color:var(--gray-900);font-size:14px;line-height:1.6;min-height:100vh}
+
+/* TOP BAR & HERO */
+.topbar{background:var(--tq-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,161,154,.25)}
 .tb-left{display:flex;align-items:center;gap:12px}
-.tb-logo{width:28px;height:auto}
-.wrap{max-width:1200px;margin:0 auto;padding:1.5rem}
-.hero{background:linear-gradient(135deg,var(--tq-dark) 0%,var(--tq) 100%);border-radius:14px;padding:2rem;color:#fff;margin-bottom:1.5rem}
+.tb-logo{width:28px;height:auto;flex-shrink:0}
+.tb-org{font-size:11px;font-weight:600;letter-spacing:.04em;opacity:.9;border-right:1px solid rgba(255,255,255,.25);padding-right:12px}
+.tb-title{font-size:12px;opacity:.75}
+.tb-right{font-family:var(--mono);font-size:11px;opacity:.65;white-space:nowrap}
+
+.wrap{max-width:1200px;margin:0 auto;padding:1.5rem 1.5rem 3rem}
+.hero{background:linear-gradient(135deg,var(--tq-dark) 0%,var(--tq) 55%,#00c4bc 100%);border-radius:var(--rl);padding:2rem 2.5rem;color:#fff;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.hero-badge{display:inline-block;background:rgba(108,194,74,.25);color:#c7f0b5;font-size:10px;font-weight:600;padding:3px 10px;border-radius:999px;margin-bottom:10px;border:1px solid rgba(108,194,74,.35)}
+.hero-title{font-size:22px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.hero-sub{font-size:13px;opacity:.75;margin-bottom:1.5rem}
+.hero-meta{display:flex;gap:1.25rem;flex-wrap:wrap}
+.hero-meta span{font-size:12px;opacity:.85;display:flex;align-items:center;gap:5px}
+
+/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
-.mc{background:#fff;border-radius:10px;border:1px solid var(--border);padding:1.1rem;position:relative}
-.card{background:#fff;border-radius:14px;border:1px solid var(--border);padding:1.5rem;margin-bottom:14px}
-.ct{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;margin-bottom:1rem}
-table{width:100%;border-collapse:collapse;font-size:12px}
-thead th{background:#F0F9F9;padding:9px 12px;text-align:left;font-size:10px;color:var(--gray-500);text-transform:uppercase;border-bottom:1px solid var(--border)}
-tbody td{padding:9px 12px;border-bottom:1px solid #F4FAF9}
-.tnum{font-family:var(--mono);text-align:right}
-.footer{text-align:center;font-size:11px;color:var(--gray-500);margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border)}
+.mc{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1.25rem;position:relative;overflow:hidden}
+.mc::after{content:'';position:absolute;top:0;left:0;width:3px;height:100%}
+.mc-tq::after{background:var(--tq)} .mc-gr::after{background:var(--gr)} .mc-am::after{background:var(--amber)} .mc-rd::after{background:var(--red)}
+.mc-label{font-size:11px;color:var(--gray-500);font-weight:600;text-transform:uppercase;margin-bottom:6px}
+.mc-val{font-size:20px;font-weight:600;font-family:var(--mono);line-height:1.2}
+.mc-sub{font-size:11px;margin-top:4px;color:var(--gray-500)}
+.mc-tq .mc-val{color:var(--tq-dark)} .mc-gr .mc-val{color:var(--gr-dark)} .mc-am .mc-val{color:var(--amber)} .mc-rd .mc-val{color:var(--red)}
+
+/* GRID & CARDS */
+.g2, .g22{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g2{grid-template-columns:1.35fr 1fr}
+.card{background:var(--white);border-radius:var(--rl);border:1px solid var(--border);padding:1.25rem 1.5rem}
+.ct{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem}
+
+/* PROG & BARS */
+.prog{margin-bottom:15px}
+.prog-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.prog-name{font-size:13px;font-weight:500}
+.prog-pct{font-family:var(--mono);font-size:13px;font-weight:600}
+.prog-amt{font-size:11px;color:var(--gray-500);margin-bottom:4px}
+.pbar{width:100%;background:var(--gray-100);border-radius:4px;height:7px}
+.pfill{height:7px;border-radius:4px}
+
+/* TABLES & CUSTOM TABLE FOR JENIS BELANJA */
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}
+thead th{background:#F0F9F9;padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--gray-500);text-transform:uppercase;border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:9px 12px;border-bottom:1px solid #F4FAF9;color:var(--gray-900)}
+tbody tr:hover{background:#F4FAF9}
+.tnum, .tpct, .tr{font-family:var(--mono);text-align:right}
+.tnum{font-size:11.5px}
+.tpct{font-size:11.5px;font-weight:600}
+
+/* J-TABLE (Jenis Belanja) */
+.jtbl{min-width:100%}
+.jtbl td{padding:7px 4px;font-size:11.5px}
+.jname{font-weight:500}
+.jbar{width:60px}
+.mbar{width:100%;background:var(--gray-100);border-radius:3px;height:5px}
+.mfill{height:5px;border-radius:3px}
+
+/* PILLS & MISC */
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700}
+.pg{background:var(--gr-pale);color:var(--gr-dark)} .pa{background:var(--amber-pale);color:var(--amber)} .pr{background:var(--red-pale);color:var(--red)}
+.cw{position:relative;width:100%}
+#loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:var(--tq-dark)}
+.footer{text-align:center;font-size:11px;color:var(--gray-500);margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);line-height:1.8}
+
+@media(max-width:900px){ .metrics{grid-template-columns:1fr 1fr} .g2,.g22{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 
+<div id="loadingOverlay">
+  Memuat Data dari Google Spreadsheet...<br>
+  <span style="font-size:12px;font-weight:400;color:#777;margin-top:10px">Harap tunggu sebentar</span>
+</div>
+
 <nav class="topbar">
   <div class="tb-left">
-    <img class="tb-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Kementerian_Kesehatan_RI_Logo.png/320px-Kementerian_Kesehatan_RI_Logo.png" alt="Logo">
-    <span style="font-weight:600">KEMKES RI</span>
-    <span style="opacity:0.7">| Ditjen Penanggulangan Penyakit</span>
+    <!-- POINT 1: Logo Kemenkes yang valid -->
+    <img class="tb-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Kementerian_Kesehatan_RI_Logo.png/320px-Kementerian_Kesehatan_RI_Logo.png" alt="Logo Kemenkes">
+    <span class="tb-org">KEMKES RI</span>
+    <span class="tb-title">Ditjen Penanggulangan Penyakit</span>
   </div>
-  <div id="clock"></div>
+  <div class="tb-right" id="clock"></div>
 </nav>
 
 <div class="wrap">
   <div class="hero">
-    <h1>Dashboard Realisasi Anggaran</h1>
-    <p>Direktorat Jenderal Penanggulangan Penyakit — Kementerian Kesehatan RI</p>
-    <div id="heroMeta" style="margin-top:10px;font-size:12px;opacity:0.8"></div>
+    <div class="hero-badge">Ditjen Penanggulangan Penyakit &nbsp;·&nbsp; Kode 02405</div>
+    <h1 class="hero-title">Dashboard Realisasi Anggaran</h1>
+    <p class="hero-sub">Direktorat Jenderal Penanggulangan Penyakit — Kementerian Kesehatan RI</p>
+    <div class="hero-meta" id="heroMeta"></div>
   </div>
+
   <div class="metrics" id="metricsRow"></div>
+
+  <!-- BARIS 1: Chart Kumulatif & Program -->
   <div class="g2">
-    <div class="card"><div class="ct">Realisasi Kumulatif per Bulan</div><canvas id="cBulan" style="height:200px"></canvas></div>
-    <div class="card"><div class="ct">Realisasi per Program</div><div id="progRows"></div></div>
+    <div class="card">
+      <div class="ct">Realisasi Kumulatif per Bulan</div>
+      <div class="cw" style="height:215px"><canvas id="cBulan"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="ct">Realisasi per Program</div>
+      <div id="progRows"></div>
+    </div>
   </div>
-  <div class="card"><div class="ct">Realisasi per Jenis Kewenangan</div><div id="kewenanganRows"></div></div>
-  <div class="card"><div class="ct">Realisasi Per Unit Kerja Kantor Pusat</div><table id="tBodyKPDetail"></table></div>
-  <div class="card"><div class="ct">Realisasi Tim Kerja (Pagu Utuh)</div><table id="tBodyTimKerja"></table></div>
+
+  <!-- BARIS 2: Jenis Belanja & Realisasi Bulanan -->
+  <div class="g22">
+    <div class="card">
+      <div class="ct">Pagu &amp; Realisasi per Jenis Belanja</div>
+      <div class="tbl-wrap" style="border:none">
+        <table class="jtbl">
+          <thead><tr>
+            <th style="border-bottom:1px solid var(--border)">Jenis Belanja</th>
+            <th class="tr" style="border-bottom:1px solid var(--border)">Pagu (M)</th>
+            <th class="tr" style="border-bottom:1px solid var(--border)">Real (M)</th>
+            <th class="jbar" style="border-bottom:1px solid var(--border)"></th>
+          </tr></thead>
+          <tbody id="jenisTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Realisasi Bulanan (Non-Kumulatif)</div>
+      <div class="cw" style="height:240px"><canvas id="cBulNon"></canvas></div>
+    </div>
+  </div>
+
+  <!-- BARIS 3: Kewenangan & Sumber Dana -->
+  <div class="g22">
+    <div class="card">
+      <div class="ct">Realisasi per Jenis Kewenangan</div>
+      <div id="kewenanganRows">
+        <p style="font-size:11px;color:#999">Buat sheet "Kewenangan" di Spreadsheet (kolom: nama, pagu, real) untuk menampilkan data ini.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Realisasi per Sumber Dana</div>
+      <div id="sumberDanaRows">Belum ada data sumber dana.</div>
+    </div>
+  </div>
+
+  <!-- BARIS 4: Detail Unit Kerja Kantor Pusat (KPDetailDana) -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct">Realisasi Per Unit Kerja Kantor Pusat (Detail Sumber Dana)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Unit Kerja</th>
+          <th>Sumber Dana</th>
+          <th class="tr">Pagu (M)</th>
+          <th class="tr">Realisasi (M)</th>
+          <th class="tr">% Serapan</th>
+        </tr></thead>
+        <tbody id="tBodyKPDetail"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BARIS 5: Tim Kerja Setditjen -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct">Realisasi Tim Kerja (Pagu Utuh)</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Nama Tim Kerja</th>
+          <th class="tr">Pagu (M)</th>
+          <th class="tr">Blokir (M)</th>
+          <th class="tr">Realisasi (M)</th>
+          <th class="tr">Out. Kontrak (M)</th>
+          <th class="tr">% Serapan</th>
+        </tr></thead>
+        <tbody id="tBodyTimKerja"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BARIS 6: TABEL SATKER -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem">
+      <div class="ct" style="margin:0">Realisasi per Satker</div>
+      <div>
+        <select id="fStatus" style="padding:4px;border-radius:4px;border:1px solid #ccc;font-size:12px">
+          <option value="all">Semua Status</option>
+          <option value="baik">✅ Baik (≥35%)</option>
+          <option value="perhatian">⚠️ Perhatian (25–34%)</option>
+          <option value="rendah">🔴 Rendah (&lt;25%)</option>
+        </select>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="text-align:center">#</th>
+          <th>Nama Satker</th>
+          <th class="tr">Pagu (Juta)</th>
+          <th class="tr">Blokir (Juta)</th>
+          <th class="tr">Realisasi (Juta)</th>
+          <th class="tr">Serapan</th>
+          <th style="text-align:center">Status</th>
+        </tr></thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+    <!-- POINT 10: Keterangan Persentase -->
+    <p style="font-size:11px;color:var(--gray-500);margin-top:10px">
+      * Parameter Status: ✅ <strong>Baik</strong> (≥35%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (25–34%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;25%)
+    </p>
+  </div>
+
+  <!-- POINT 11 & 12: Footer Internal & Pengelola -->
   <div class="footer">
-    <p>Dashboard untuk keperluan monitoring internal dan transparansi publik.</p>
-    <p><strong>Dikelola oleh Tim Kerja Keuangan dan BMN Ditjen P2 Kemenkes RI</strong></p>
+    <strong style="color:var(--tq-dark)">Dashboard untuk keperluan monitoring internal dan transparansi publik.</strong><br>
+    Dikelola oleh Tim Kerja Keuangan dan BMN Ditjen P2 Kemenkes RI.
   </div>
 </div>
 
 <script>
-// URL API Anda yang baru
+// ============================================================
+// KONFIGURASI API (UBAH URL DI BAWAH INI)
+// ============================================================
 const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbyUAzl_6dpu0xj5-kP0ixEtI67vvJMGjmD7KM1Q6BYlbVeKz8RDSfWoKU5BhLgWfgqE/exec";
 
-// Fungsi sinkronisasi sama seperti sebelumnya...
-async function sync() {
-  try {
-    const res = await fetch(SPREADSHEET_API_URL);
-    const d = await res.json();
-    
-    // Rendering data...
-    // (Kode render grafik dan tabel tetap sama dengan versi sebelumnya)
-    // ... [Kode render fungsi initDashboard] ...
-    
-    // Pastikan memanggil fungsi initDashboard() di sini setelah data ditarik
-  } catch(e) { console.error(e); }
+// Variabel Penampung Data
+let CONFIG = {};
+let bulananData = [], programData = [], jenisData = [], satkerData = [];
+let kewenanganData = [], sumberDanaData = [], timKerjaData = [], kpDetailDanaData = [];
+
+// Fungsi Format Angka
+const fmtM = v => (Number(v)/1e9).toFixed(2);
+const fmtJt = v => Math.round(Number(v)/1e6).toLocaleString('id-ID');
+const pct = (r,p) => Number(p)>0 ? +(Number(r)/Number(p)*100).toFixed(2) : 0;
+
+function colForPct(p){ return p>=35?'#007A75':p>=25?'#D97706':'#B91C1C'; }
+function badgePct(p){
+  if(p>=35) return '<span class="pill pg">✅ Baik</span>';
+  if(p>=25) return '<span class="pill pa">⚠️ Perhatian</span>';
+  return '<span class="pill pr">🔴 Rendah</span>';
 }
-sync();
+
+// Jam Digital
+setInterval(() => {
+  const n = new Date();
+  document.getElementById('clock').textContent = n.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'}) + '  ' + n.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+}, 1000);
+
+// ============================================================
+// PENARIKAN DATA
+// ============================================================
+async function sinkronisasiData() {
+  try {
+    const response = await fetch(SPREADSHEET_API_URL);
+    const data = await response.json();
+
+    CONFIG = {
+      tanggalData: data.config.tanggalData || '-',
+      nomorRevisi: Number(data.config.nomorRevisi) || 0,
+      jumlahSatker: Number(data.config.jumlahSatker) || 0,
+      totalPagu: Number(data.config.totalPagu) || 0,
+      totalBlokir: Number(data.config.totalBlokir) || 0,
+      totalReal: Number(data.config.totalReal) || 0,
+      targetBulan: Number(data.config.targetBulan) || 0
+    };
+    
+    bulananData = data.bulanan || [];
+    programData = data.program || [];
+    jenisData = data.jenis || [];
+    satkerData = data.satker || [];
+    kewenanganData = data.kewenangan || [];
+    sumberDanaData = data.sumberDana || [];
+    timKerjaData = data.timKerja || [];
+    kpDetailDanaData = data.kpDetailDana || [];
+
+    document.getElementById('loadingOverlay').style.display = 'none';
+    initDashboard();
+  } catch (error) {
+    console.error("Gagal sinkronisasi:", error);
+    document.getElementById('loadingOverlay').innerHTML = "<span style='color:red'>Gagal terhubung ke Spreadsheet. Periksa koneksi atau URL API Anda.</span>";
+  }
+}
+
+// ============================================================
+// RENDERING ENGINE
+// ============================================================
+function initDashboard() {
+  const pctReal = pct(CONFIG.totalReal, CONFIG.totalPagu);
+  const sisa = CONFIG.totalPagu - CONFIG.totalReal;
+  
+  // POINT 3: Menghitung Deviasi Target (GAP)
+  const deviasi = (pctReal - CONFIG.targetBulan).toFixed(2);
+  const devText = deviasi >= 0 ? '+' + deviasi : deviasi;
+  const devColor = deviasi >= 0 ? 'var(--gr-dark)' : 'var(--red)';
+
+  // POINT 9: Hero Meta (Sumber Data Diubah)
+  document.getElementById('heroMeta').innerHTML = `
+    <span>Data per ${CONFIG.tanggalData}</span>
+    <span>Revisi DIPA ke-${CONFIG.nomorRevisi}</span>
+    <span>Sumber: ADK My Intress Kemenkeu</span>
+  `;
+
+  // Metrics Box (Sisa Anggaran Update POINT 2)
+  document.getElementById('metricsRow').innerHTML=`
+    <div class="mc mc-tq">
+      <div class="mc-label">Total Pagu DIPA</div>
+      <div class="mc-val">Rp ${fmtM(CONFIG.totalPagu)} M</div>
+      <div class="mc-sub">Info: Terdapat Blokir Rp ${fmtM(CONFIG.totalBlokir)} M</div>
+    </div>
+    <div class="mc mc-gr">
+      <div class="mc-label">Total Realisasi</div>
+      <div class="mc-val">Rp ${fmtM(CONFIG.totalReal)} M</div>
+      <div class="mc-sub" style="color:var(--gr-dark)">${pctReal.toFixed(2)}% dari Pagu DIPA</div>
+    </div>
+    <div class="mc mc-am">
+      <div class="mc-label">Sisa Anggaran</div>
+      <div class="mc-val">Rp ${fmtM(sisa)} M</div>
+      <div class="mc-sub">${(100-pctReal).toFixed(2)}% belum terserap s/d ${CONFIG.tanggalData}</div>
+    </div>
+    <div class="mc mc-rd">
+      <div class="mc-label">Target Bulan Ini</div>
+      <div class="mc-val">${CONFIG.targetBulan.toFixed(2)}%</div>
+      <div class="mc-sub" style="color:${devColor}; font-weight:500;">Deviasi: ${devText}% (GAP)</div>
+    </div>`;
+
+  // Program Bars
+  document.getElementById('progRows').innerHTML = programData.map(p => {
+    const pc = pct(p.real, p.pagu); const col = colForPct(pc);
+    return `<div class="prog">
+      <div class="prog-head"><span class="prog-name">${p.nama}</span><span class="prog-pct" style="color:${col}">${pc.toFixed(2)}%</span></div>
+      <div class="prog-amt">Real: Rp ${fmtM(p.real)} M / Pagu: Rp ${fmtM(p.pagu)} M</div>
+      <div class="pbar"><div class="pfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+
+  // POINT 5: Jenis Belanja Table
+  if(jenisData.length > 0) {
+    document.getElementById('jenisTbody').innerHTML = jenisData.map(d => {
+      const pc = pct(d.real, d.pagu); const col = colForPct(pc);
+      return `<tr>
+        <td class="jname">${d.nama||'-'}</td>
+        <td class="jnum">${fmtM(d.pagu)}</td>
+        <td class="jreal" style="color:${col}">${fmtM(d.real)}</td>
+        <td class="jbar"><div class="mbar"><div class="mfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Kewenangan Bars
+  if(kewenanganData.length > 0) {
+    document.getElementById('kewenanganRows').innerHTML = kewenanganData.map(d => {
+      const pc = pct(d.real, d.pagu); const col = colForPct(pc);
+      return `<div class="prog">
+        <div class="prog-head"><span class="prog-name">${d.nama}</span><span class="prog-pct" style="color:${col}">${pc.toFixed(2)}%</span></div>
+        <div class="prog-amt">Real: Rp ${fmtM(d.real)} M / Pagu: Rp ${fmtM(d.pagu)} M</div>
+        <div class="pbar"><div class="pfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Sumber Dana Bars
+  if(sumberDanaData.length > 0) {
+    document.getElementById('sumberDanaRows').innerHTML = sumberDanaData.map(d => {
+      const pc = pct(d.real, d.pagu); const col = colForPct(pc);
+      return `<div class="prog">
+        <div class="prog-head"><span class="prog-name">${d.nama}</span><span class="prog-pct" style="color:${col}">${pc.toFixed(2)}%</span></div>
+        <div class="prog-amt">Real: Rp ${fmtM(d.real)} M / Pagu: Rp ${fmtM(d.pagu)} M</div>
+        <div class="pbar"><div class="pfill" style="width:${Math.min(pc,100)}%;background:${col}"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // POINT 8: Tabel Matriks KPDetailDana
+  if(kpDetailDanaData.length > 0) {
+    document.getElementById('tBodyKPDetail').innerHTML = kpDetailDanaData.map(d => {
+      let pg = Number(d.pagu)||0, rl = Number(d.real)||0;
+      let pc = pct(rl, pg);
+      return `<tr>
+        <td style="font-weight:500">${d.unit_kerja||'-'}</td>
+        <td>${d.sumber_dana||'-'}</td>
+        <td class="tnum">${fmtM(pg)}</td>
+        <td class="tnum" style="color:var(--gr-dark)">${fmtM(rl)}</td>
+        <td class="tpct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</td>
+      </tr>`;
+    }).join('');
+  } else {
+    document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-style:italic">Belum ada data detail Kantor Pusat.</td></tr>';
+  }
+
+  // Tim Kerja Table
+  if(timKerjaData.length > 0) {
+    document.getElementById('tBodyTimKerja').innerHTML = timKerjaData.map(d => {
+      let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0;
+      let pcUtuh = pct(rl, pg);
+      return `<tr>
+        <td style="font-weight:500">${d.nama||'-'}</td>
+        <td class="tnum" style="font-weight:600; background:#F4FAF9;">${fmtM(pg)}</td>
+        <td class="tnum" style="color:var(--red)">${fmtM(blk)}</td>
+        <td class="tnum" style="color:var(--gr-dark)">${fmtM(rl)}</td>
+        <td class="tnum" style="color:var(--amber)">${fmtM(ok)}</td>
+        <td class="tpct" style="color:${colForPct(pcUtuh)}">${pcUtuh.toFixed(2)}%</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // POINT 4 & 6: Data Preparation for Charts (Menghitung Kumulatif Otomatis)
+  let kumulatifArr = [];
+  let nonKumulatifArr = [];
+  let currentSum = 0;
+  
+  bulananData.forEach(d => {
+    let val = Number(d.real) || 0;
+    currentSum += val; // Menambahkan nilai bulan ini ke total kumulatif
+    kumulatifArr.push(+(currentSum / 1e9).toFixed(2)); // Konversi ke Milyar
+    nonKumulatifArr.push(+(val / 1e9).toFixed(2));     // Konversi ke Milyar
+  });
+
+  const totalPaguM = CONFIG.totalPagu / 1e9;
+  const idealPer12 = bulananData.map((_,i)=>+((CONFIG.totalPagu*(CONFIG.targetBulan/100)/(12))*(i+1)/1e9).toFixed(1));
+
+  // Render Grafik Kumulatif (Chart 1)
+  if(document.getElementById('cBulan')) {
+    new Chart(document.getElementById('cBulan'), {
+      data: {
+        labels: bulananData.map(d=>d.bln),
+        datasets: [
+          {type:'bar', label:'Realisasi Kumulatif', data:kumulatifArr, backgroundColor:'rgba(0,161,154,.72)', borderRadius:5, order:2},
+          {type:'line', label:'Target Ideal', data:idealPer12, borderColor:'#D97706', borderDash:[6,4], borderWidth:2, pointRadius:4, pointBackgroundColor:'#D97706', backgroundColor:'transparent', tension:.35, order:1}
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 10 } } } },
+        scales: { x: { grid: { display: false } }, y: { grid: { color: '#eee' }, ticks: { callback: v => v + ' M', font: { size: 10 } } } }
+      }
+    });
+  }
+
+  // Render Grafik Non-Kumulatif (Chart 2)
+  if(document.getElementById('cBulNon')) {
+    new Chart(document.getElementById('cBulNon'), {
+      type: 'bar',
+      data: {
+        labels: bulananData.map(d=>d.bln),
+        datasets: [{ label: 'Realisasi Bulanan', data: nonKumulatifArr, backgroundColor: '#8FD66E', borderRadius: 5 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { grid: { display: false } }, y: { grid: { color: '#eee' }, ticks: { callback: v => v + ' M', font: { size: 10 } } } }
+      }
+    });
+  }
+
+  // Render Satker Table
+  function renderSatker() {
+    const fv = document.getElementById('fStatus').value;
+    let data = satkerData.map(d => {
+      let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0;
+      let p = pct(rl, pg);
+      return {...d, pg, blk, rl, pct: p};
+    });
+
+    if(fv !== 'all') {
+      data = data.filter(d => (fv==='baik' && d.pct>=35) || (fv==='perhatian' && d.pct>=25 && d.pct<35) || (fv==='rendah' && d.pct<25));
+    }
+    
+    data.sort((a,b) => b.pct - a.pct);
+
+    document.getElementById('tBody').innerHTML = data.map((d,i) => `<tr>
+      <td style="text-align:center;color:#999" class="tnum">${i+1}</td>
+      <td style="font-weight:500">${d.nama||'-'}</td>
+      <td class="tnum" style="font-weight:600; background:#F4FAF9">${fmtJt(d.pg)}</td>
+      <td class="tnum" style="color:var(--red)">${fmtJt(d.blk)}</td>
+      <td class="tnum" style="color:var(--gr-dark)">${fmtJt(d.rl)}</td>
+      <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
+      <td style="text-align:center">${badgePct(d.pct)}</td>
+    </tr>`).join('');
+  }
+
+  renderSatker();
+  document.getElementById('fStatus').addEventListener('change', renderSatker);
+}
+
+// Jalankan Sinkronisasi Pertama Kali
+sinkronisasiData();
 </script>
 </body>
 </html>
