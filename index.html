@@ -26,7 +26,7 @@ body{font-family:var(--font);font-weight:bold;background:var(--tq-bg);color:var(
 th, td, input, select, button, .mc-label, .ct, .prog-name { font-weight: bold; }
 
 /* TOP BAR & HERO */
-.topbar{background:var(--tq-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,161,154,.25)}
+.topbar{background:var(--tq-dark);color:#fff;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,161,154,.25)}
 .tb-left{display:flex;align-items:center;gap:12px}
 .tb-org{font-size:13px;letter-spacing:.04em;opacity:.9;border-right:1px solid rgba(255,255,255,.25);padding-right:12px}
 .tb-title{font-size:13px;opacity:.85}
@@ -95,12 +95,13 @@ tbody tr:hover{background:#E0F5F4}
 <body>
 
 <div id="loadingOverlay">
-  Mohon sabar Menunggu Gaji ke 13...<br>
+  Memuat Data dari Google Spreadsheet...<br>
   <span style="font-size:14px;color:#777;margin-top:10px">Harap tunggu sebentar</span>
 </div>
 
 <nav class="topbar">
   <div class="tb-left">
+    <img src="https://kemkes.go.id/app_asset/image_content_download/170608421265b0c77488c048.52529672.png" alt="Logo Kemenkes" style="height: 40px; width: auto; object-fit: contain;">
     <span class="tb-org">KEMKES RI</span>
     <span class="tb-title">Ditjen Penanggulangan Penyakit</span>
   </div>
@@ -376,7 +377,6 @@ function initDashboard() {
     }).join('');
   }
 
-  /* LOGIKA UPDATE: Pengelompokan dan Pembuatan Subtotal Unit Kerja Kantor Pusat */
   if(kpDetailDanaData.length > 0) {
     const groups = {};
     kpDetailDanaData.forEach(d => {
