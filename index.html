@@ -41,15 +41,18 @@ th, .mc-label, .mc-val, .ct, .prog-name, .tb-org { font-weight: bold; }
 .hero-meta{display:flex;gap:1.25rem;flex-wrap:wrap}
 .hero-meta span{font-size:13px;opacity:.9;display:flex;align-items:center;gap:5px}
 
-/* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+/* METRICS (Diubah ke 5 Kolom) */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.5rem}
 .mc{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1.25rem;position:relative;overflow:hidden}
 .mc::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
-.mc-tq::after{background:var(--tq)} .mc-gr::after{background:var(--gr)} .mc-am::after{background:var(--amber)} .mc-rd::after{background:var(--red)}
+.mc-tq::after{background:var(--tq)} .mc-gr::after{background:var(--gr)} .mc-am::after{background:var(--amber)} .mc-rd::after{background:var(--red)} 
+.mc-bl::after{background:#2563EB} /* Warna Biru untuk Ranking */
+
 .mc-label{font-size:12px;color:var(--gray-700);text-transform:uppercase;margin-bottom:6px}
 .mc-val{font-size:22px;font-family:var(--mono);line-height:1.2}
 .mc-sub{font-size:12px;margin-top:4px;color:var(--gray-500)}
 .mc-tq .mc-val{color:var(--tq-dark)} .mc-gr .mc-val{color:var(--gr-dark)} .mc-am .mc-val{color:var(--amber)} .mc-rd .mc-val{color:var(--red)}
+.mc-bl .mc-val{color:#1D4ED8}
 
 /* GRID & CARDS */
 .g2, .g22{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
@@ -252,8 +255,10 @@ tbody tr:hover{background:#F4FAF9}
           <th>Nama Satker</th>
           <th class="tr">Pagu (Juta)</th>
           <th class="tr">Blokir (Juta)</th>
-          <th class="tr">Target RPD (Juta)</th> <th class="tr">Realisasi (Juta)</th>
-          <th class="tr">Deviasi (Juta)</th> <th class="tr">Serapan</th>
+          <th class="tr">Target RPD (Juta)</th> 
+          <th class="tr">Realisasi (Juta)</th>
+          <th class="tr">Deviasi (Juta)</th> 
+          <th class="tr">Serapan</th>
           <th style="text-align:center">Status</th>
         </tr></thead>
         <tbody id="tBody"></tbody>
@@ -330,6 +335,7 @@ async function sinkronisasiData() {
     const data = JSON.parse(textData);
     const configData = data.config || {};
 
+    // Menangkap data rankingEselon dari Spreadsheet
     CONFIG = {
       tanggalData: configData.tanggalData || '-',
       nomorRevisi: Number(configData.nomorRevisi) || 0,
@@ -337,7 +343,8 @@ async function sinkronisasiData() {
       totalPagu: Number(configData.totalPagu) || 0,
       totalBlokir: Number(configData.totalBlokir) || 0,
       totalReal: Number(configData.totalReal) || 0,
-      targetBulan: Number(configData.targetBulan) || 0
+      targetBulan: Number(configData.targetBulan) || 0,
+      rankingEselon: configData.rankingEselon || '-' 
     };
     
     bulananData = data.bulanan || [];
@@ -374,6 +381,7 @@ function initDashboard() {
     <span>Sumber: ADK My Intress Kemenkeu</span>
   `;
 
+  // MENAMPILKAN 5 KOTAK METRIK (TERMASUK PERINGKAT ESELON I)
   document.getElementById('metricsRow').innerHTML=`
     <div class="mc mc-tq">
       <div class="mc-label">Total Pagu DIPA</div>
@@ -394,6 +402,11 @@ function initDashboard() {
       <div class="mc-label">Target Bulan Ini</div>
       <div class="mc-val">${CONFIG.targetBulan.toFixed(2)}%</div>
       <div class="mc-sub" style="color:${devColor};">Deviasi: ${devText}% (GAP)</div>
+    </div>
+    <div class="mc mc-bl">
+      <div class="mc-label">Peringkat Eselon I</div>
+      <div class="mc-val">#${CONFIG.rankingEselon}</div>
+      <div class="mc-sub" style="color:#2563EB; font-weight:bold;">Tingkat Kemenkes RI</div>
     </div>`;
 
   document.getElementById('progRows').innerHTML = programData.map(p => {
@@ -627,10 +640,9 @@ function initDashboard() {
   function renderSatker() {
     const fv = document.getElementById('fStatus').value;
     
-    // PEMROSESAN KOLOM RPD DAN DEVIASI BARU
     let data = satkerData.map(d => {
       let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, rpd = Number(d.rpd)||0;
-      let dev = rl - rpd; // Hitung deviasi nominal (Real - RPD)
+      let dev = rl - rpd; 
       return {...d, pg, blk, rl, rpd, dev, pct: pct(rl, pg)};
     });
 
@@ -646,7 +658,6 @@ function initDashboard() {
     }
 
     document.getElementById('tBody').innerHTML = data.map((d,i) => {
-      // Menentukan warna dan tanda plus/minus untuk deviasi
       let devColor = d.dev >= 0 ? 'var(--gr-dark)' : 'var(--red)';
       let devSign = d.dev >= 0 ? '+' : '';
 
