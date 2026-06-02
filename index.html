@@ -224,6 +224,7 @@ tbody tr:hover{background:#F4FAF9}
     </div>
   </div>
 
+  <!-- KARTU BARU: GRAFIK SATKER -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-header">
       <div class="ct">Grafik Persentase Serapan per Satker & Ditjen P2</div>
@@ -441,6 +442,7 @@ function initDashboard() {
     }).join('');
   }
 
+  // PENGURUTAN DETAIL KANTOR PUSAT BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
   if(kpDetailDanaData.length > 0) {
     const groupsObj = {};
     kpDetailDanaData.forEach(d => {
@@ -494,6 +496,7 @@ function initDashboard() {
     document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;font-weight:normal;">Belum ada data detail Kantor Pusat.</td></tr>';
   }
 
+  // PENGURUTAN TIM KERJA BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
   if(timKerjaData.length > 0) {
     const sortedTimKerjaData = [...timKerjaData].sort((a, b) => {
       let pctA = pct(Number(a.real) || 0, Number(a.pagu) || 0);
@@ -502,18 +505,17 @@ function initDashboard() {
     });
 
     document.getElementById('tBodyTimKerja').innerHTML = sortedTimKerjaData.map(d => {
-      let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
+      let pg = Number(d.pagu)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
       return `<tr>
         <td>${d.nama||'-'}</td>
         <td class="tnum" style="background:#F4FAF9;">${fmtM(pg)}</td>
-        <td class="tnum" style="color:var(--red)">${fmtM(blk)}</td>
         <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtM(rl)}</td>
         <td class="tnum" style="color:var(--amber)">${fmtM(ok)}</td>
         <td class="tpct" style="color:${colForPct(pcUtuh)}">${pcUtuh.toFixed(2)}%</td>
       </tr>`;
     }).join('');
   } else {
-    document.getElementById('tBodyTimKerja').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;font-weight:normal;">Belum ada data Tim Kerja.</td></tr>';
+    document.getElementById('tBodyTimKerja').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data Tim Kerja.</td></tr>';
   }
 
   let kumulatifArr = [], nonKumulatifArr = [], currentSum = 0;
