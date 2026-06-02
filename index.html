@@ -224,7 +224,6 @@ tbody tr:hover{background:#F4FAF9}
     </div>
   </div>
 
-  <!-- KARTU BARU: GRAFIK SATKER -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-header">
       <div class="ct">Grafik Persentase Serapan per Satker & Ditjen P2</div>
@@ -235,7 +234,7 @@ tbody tr:hover{background:#F4FAF9}
 
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:1rem">
-      <div class="ct" style="margin:0">Realisasi per Satker</div>
+      <div class="ct" style="margin:0">Realisasi per Satker (Halaman III DIPA)</div>
       <div style="display:flex; gap:12px; align-items:center;">
         <select id="fStatus" style="padding:6px;border-radius:4px;border:1px solid #ccc;font-size:13px;font-weight:bold;">
           <option value="all">Semua Status</option>
@@ -253,14 +252,15 @@ tbody tr:hover{background:#F4FAF9}
           <th>Nama Satker</th>
           <th class="tr">Pagu (Juta)</th>
           <th class="tr">Blokir (Juta)</th>
-          <th class="tr">Realisasi (Juta)</th>
-          <th class="tr">Serapan</th>
+          <th class="tr">Target RPD (Juta)</th> <th class="tr">Realisasi (Juta)</th>
+          <th class="tr">Deviasi (Juta)</th> <th class="tr">Serapan</th>
           <th style="text-align:center">Status</th>
         </tr></thead>
         <tbody id="tBody"></tbody>
       </table>
     </div>
     <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
+      * Deviasi = Realisasi Aktual dikurangi Target RPD. (Minus = Capaian di bawah Rencana)<br>
       * Parameter Status: ✅ <strong>Baik</strong> (≥35%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (25–34%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;25%)
     </p>
   </div>
@@ -442,7 +442,6 @@ function initDashboard() {
     }).join('');
   }
 
-  // PENGURUTAN DETAIL KANTOR PUSAT BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
   if(kpDetailDanaData.length > 0) {
     const groupsObj = {};
     kpDetailDanaData.forEach(d => {
@@ -496,7 +495,6 @@ function initDashboard() {
     document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;font-weight:normal;">Belum ada data detail Kantor Pusat.</td></tr>';
   }
 
-  // PENGURUTAN TIM KERJA BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
   if(timKerjaData.length > 0) {
     const sortedTimKerjaData = [...timKerjaData].sort((a, b) => {
       let pctA = pct(Number(a.real) || 0, Number(a.pagu) || 0);
@@ -561,27 +559,23 @@ function initDashboard() {
     });
   }
 
-  // LOGIKA GRAFIK SATKER BARU 
   if(satkerData.length > 0) {
     let satkerChartData = satkerData.map(d => ({
       nama: d.nama || 'Tanpa Nama',
       pct: pct(Number(d.real) || 0, Number(d.pagu) || 0)
     }));
     
-    // Memasukkan Total Ditjen P2
     satkerChartData.push({
       nama: 'DITJEN P2 (TOTAL)',
-      pct: pctReal // Variabel ini sudah dihitung di awal fungsi
+      pct: pctReal 
     });
 
-    // Urutkan dari serapan tertinggi ke terendah
     satkerChartData.sort((a,b) => b.pct - a.pct);
 
     const sLabels = satkerChartData.map(d => d.nama);
     const sData = satkerChartData.map(d => d.pct);
     const targetData = sLabels.map(() => CONFIG.targetBulan);
     
-    // Warna: Batang Satker = Hijau Kemenkes, Batang Total = Kuning/Amber
     const barColors = satkerChartData.map(d => d.nama === 'DITJEN P2 (TOTAL)' ? '#D97706' : 'rgba(108,194,74,.9)');
 
     if(document.getElementById('cSatker')) {
@@ -593,7 +587,7 @@ function initDashboard() {
               type: 'line',
               label: 'Target Bulan Ini (' + CONFIG.targetBulan + '%)',
               data: targetData,
-              borderColor: '#00A19A', // Warna Tosca Kemenkes untuk garis target
+              borderColor: '#00A19A', 
               backgroundColor: '#00A19A',
               borderWidth: 2,
               borderDash: [6, 4],
@@ -632,9 +626,12 @@ function initDashboard() {
 
   function renderSatker() {
     const fv = document.getElementById('fStatus').value;
+    
+    // PEMROSESAN KOLOM RPD DAN DEVIASI BARU
     let data = satkerData.map(d => {
-      let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0;
-      return {...d, pg, blk, rl, pct: pct(rl, pg)};
+      let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, rpd = Number(d.rpd)||0;
+      let dev = rl - rpd; // Hitung deviasi nominal (Real - RPD)
+      return {...d, pg, blk, rl, rpd, dev, pct: pct(rl, pg)};
     });
 
     if(fv !== 'all') {
@@ -644,19 +641,25 @@ function initDashboard() {
     data.sort((a,b) => b.pct - a.pct);
 
     if (data.length === 0) {
-        document.getElementById('tBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;font-weight:normal;">Tidak ada data Satker.</td></tr>';
+        document.getElementById('tBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;font-weight:normal;">Tidak ada data Satker.</td></tr>';
         return;
     }
 
-    document.getElementById('tBody').innerHTML = data.map((d,i) => `<tr>
-      <td style="text-align:center;color:#999" class="tnum">${i+1}</td>
-      <td>${d.nama||'-'}</td>
-      <td class="tnum" style="background:#F4FAF9">${fmtJt(d.pg)}</td>
-      <td class="tnum" style="color:var(--red)">${fmtJt(d.blk)}</td>
-      <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(d.rl)}</td>
-      <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
-      <td style="text-align:center">${badgePct(d.pct)}</td>
-    </tr>`).join('');
+    document.getElementById('tBody').innerHTML = data.map((d,i) => {
+      // Menentukan warna dan tanda plus/minus untuk deviasi
+      let devColor = d.dev >= 0 ? 'var(--gr-dark)' : 'var(--red)';
+      let devSign = d.dev >= 0 ? '+' : '';
+
+      return `<tr>
+        <td style="text-align:center;color:#999" class="tnum">${i+1}</td>
+        <td>${d.nama||'-'}</td>
+        <td class="tnum" style="background:#F4FAF9">${fmtJt(d.pg)}</td>
+        <td class="tnum" style="color:var(--red)">${fmtJt(d.blk)}</td>
+        <td class="tnum" style="color:var(--amber)">${fmtJt(d.rpd)}</td> <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(d.rl)}</td>
+        <td class="tnum" style="color:${devColor}; font-weight:bold;">${devSign}${fmtJt(d.dev)}</td> <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
+        <td style="text-align:center">${badgePct(d.pct)}</td>
+      </tr>`;
+    }).join('');
   }
 
   renderSatker();
