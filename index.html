@@ -172,6 +172,7 @@ tbody tr:hover{background:#F4FAF9}
           <th>Sumber Dana</th>
           <th class="tr">Pagu (M)</th>
           <th class="tr">Realisasi (M)</th>
+          <th class="tr">Out. Kontrak (M)</th>
           <th class="tr">% Serapan</th>
         </tr></thead>
         <tbody id="tBodyKPDetail"></tbody>
@@ -386,11 +387,12 @@ function initDashboard() {
     kpDetailDanaData.forEach(d => {
       const unit = d.unit_kerja || 'Tanpa Nama Unit';
       if (!groupsObj[unit]) {
-        groupsObj[unit] = { items: [], subPagu: 0, subReal: 0 };
+        groupsObj[unit] = { items: [], subPagu: 0, subReal: 0, subOk: 0 }; // Ditambahkan penampung subOk
       }
       groupsObj[unit].items.push(d);
       groupsObj[unit].subPagu += Number(d.pagu) || 0;
       groupsObj[unit].subReal += Number(d.real) || 0;
+      groupsObj[unit].subOk += Number(d.ok) || 0; // Mengakumulasi data outstanding kontrak
     });
     
     const sortedGroupsArr = Object.keys(groupsObj).map(unit => ({
@@ -398,14 +400,16 @@ function initDashboard() {
       items: groupsObj[unit].items,
       subPagu: groupsObj[unit].subPagu,
       subReal: groupsObj[unit].subReal,
-      subPct: pct(groupsObj[unit].subReal, groupsObj[unit].subPagu) // Hitung persentase sub-unit
-    })).sort((a, b) => b.subPct - a.subPct); // Urutkan berdasarkan persentase
+      subOk: groupsObj[unit].subOk,
+      subPct: pct(groupsObj[unit].subReal, groupsObj[unit].subPagu)
+    })).sort((a, b) => b.subPct - a.subPct);
     
     let htmlKPDetail = '';
     sortedGroupsArr.forEach(group => {
       group.items.forEach(d => {
         const pg = Number(d.pagu)||0;
         const rl = Number(d.real)||0;
+        const ok = Number(d.ok)||0; // Membaca properti d.ok dari JSON
         const pc = pct(rl, pg);
         
         htmlKPDetail += `<tr>
@@ -413,6 +417,7 @@ function initDashboard() {
           <td>${d.sumber_dana||'-'}</td>
           <td class="tnum">${fmtM(pg)}</td>
           <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtM(rl)}</td>
+          <td class="tnum" style="color:var(--amber)">${fmtM(ok)}</td>
           <td class="tpct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</td>
         </tr>`;
       });
@@ -421,12 +426,13 @@ function initDashboard() {
         <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase; font-weight:bold;">↳ TOTAL SUB-UNIT: ${group.unitName}</td>
         <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subPagu)}</td>
         <td class="tnum" style="color:var(--gr-dark); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subReal)}</td>
+        <td class="tnum" style="color:var(--amber); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subOk)}</td>
         <td class="tpct" style="color:${colForPct(group.subPct)}; border-top: 1px solid var(--tq-light); font-weight: bold;">${group.subPct.toFixed(2)}%</td>
       </tr>`;
     });
     document.getElementById('tBodyKPDetail').innerHTML = htmlKPDetail;
   } else {
-    document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data detail Kantor Pusat.</td></tr>';
+    document.getElementById('tBodyKPDetail').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#999;font-weight:normal;">Belum ada data detail Kantor Pusat.</td></tr>';
   }
 
   // PENGURUTAN TIM KERJA BERDASARKAN PERSENTASE SERAPAN (% TERTINGGI KE TERENDAH)
