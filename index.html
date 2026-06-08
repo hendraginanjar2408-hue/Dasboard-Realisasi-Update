@@ -41,12 +41,12 @@ th, .mc-label, .mc-val, .ct, .prog-name, .tb-org { font-weight: bold; }
 .hero-meta{display:flex;gap:1.25rem;flex-wrap:wrap}
 .hero-meta span{font-size:13px;opacity:.9;display:flex;align-items:center;gap:5px}
 
-/* METRICS (Diubah ke 5 Kolom) */
+/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.5rem}
 .mc{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1.25rem;position:relative;overflow:hidden}
 .mc::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
 .mc-tq::after{background:var(--tq)} .mc-gr::after{background:var(--gr)} .mc-am::after{background:var(--amber)} .mc-rd::after{background:var(--red)} 
-.mc-bl::after{background:#2563EB} /* Warna Biru untuk Ranking */
+.mc-bl::after{background:#2563EB} 
 
 .mc-label{font-size:12px;color:var(--gray-700);text-transform:uppercase;margin-bottom:6px}
 .mc-val{font-size:22px;font-family:var(--mono);line-height:1.2}
@@ -82,6 +82,12 @@ tbody tr:hover{background:#F4FAF9}
 .tnum, .tpct, .tr{font-family:var(--mono);text-align:right}
 .tnum{font-size:13px}
 .tpct{font-size:13px;font-weight:bold;}
+
+/* KONTRAK TABLE SCROLL & CLICK */
+.row-clickable { cursor: pointer; transition: background 0.2s ease; }
+.row-clickable:hover { background: var(--tq-pale) !important; }
+.tbl-scroll { max-height: 350px; overflow-y: auto; }
+.tbl-scroll thead th { position: sticky; top: 0; background: #F0F9F9; z-index: 2; }
 
 /* J-TABLE */
 .jtbl{min-width:100%}
@@ -229,6 +235,30 @@ tbody tr:hover{background:#F4FAF9}
 
   <div class="card" style="margin-bottom:14px">
     <div class="card-header">
+      <div class="ct">Monitoring Outstanding Kontrak (Sisa Nilai Pekerjaan)</div>
+      <button class="btn-download" onclick="downloadCard(this, 'Outstanding_Kontrak')" title="Unduh Kartu" data-html2canvas-ignore="true">📥</button>
+    </div>
+    <div class="tbl-wrap tbl-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Satker</th>
+            <th>Uraian Kontrak</th>
+            <th style="text-align:center;">Status</th>
+            <th>Tgl Berakhir</th>
+            <th class="tr">Outstanding</th>
+          </tr>
+        </thead>
+        <tbody id="tBodyKontrak">
+          </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
+      * Klik pada baris kontrak untuk melihat rincian secara utuh.
+    </p>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-header">
       <div class="ct">Grafik Persentase Serapan per Satker & Ditjen P2</div>
       <button class="btn-download" onclick="downloadCard(this, 'Grafik_Serapan_Satker')" title="Unduh Kartu" data-html2canvas-ignore="true">📥</button>
     </div>
@@ -282,6 +312,7 @@ const SPREADSHEET_API_URL = "https://script.google.com/macros/s/AKfycbyUAzl_6dpu
 let CONFIG = {};
 let bulananData = [], programData = [], jenisData = [], satkerData = [];
 let kewenanganData = [], sumberDanaData = [], timKerjaData = [], kpDetailDanaData = [];
+let kontrakData = []; // Variabel baru untuk menampung data kontrak
 
 const fmtM = v => (Number(v)/1e9).toFixed(2);
 const fmtJt = v => Math.round(Number(v)/1e6).toLocaleString('id-ID');
@@ -335,7 +366,6 @@ async function sinkronisasiData() {
     const data = JSON.parse(textData);
     const configData = data.config || {};
 
-    // Menangkap data rankingEselon dari Spreadsheet
     CONFIG = {
       tanggalData: configData.tanggalData || '-',
       nomorRevisi: Number(configData.nomorRevisi) || 0,
@@ -355,6 +385,9 @@ async function sinkronisasiData() {
     sumberDanaData = data.sumberDana || [];
     timKerjaData = data.timKerja || [];
     kpDetailDanaData = data.kpDetailDana || [];
+    
+    // Menangkap data kontrak dari API
+    kontrakData = data.kontrak || [];
 
     document.getElementById('loadingOverlay').style.display = 'none';
     initDashboard();
@@ -381,7 +414,6 @@ function initDashboard() {
     <span>Sumber: ADK My Intress Kemenkeu</span>
   `;
 
-  // MENAMPILKAN 5 KOTAK METRIK (TERMASUK PERINGKAT ESELON I)
   document.getElementById('metricsRow').innerHTML=`
     <div class="mc mc-tq">
       <div class="mc-label">Total Pagu DIPA</div>
@@ -528,6 +560,46 @@ function initDashboard() {
   } else {
     document.getElementById('tBodyTimKerja').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data Tim Kerja.</td></tr>';
   }
+
+  // FUNGSI RENDER KONTRAK
+  function renderKontrak() {
+    const tbody = document.getElementById('tBodyKontrak');
+    if (!kontrakData || kontrakData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data monitoring kontrak dari sistem.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = kontrakData.map(d => {
+      let statusBadge = '';
+      const stat = d.status ? String(d.status).toUpperCase() : '';
+      if (stat.includes('BELUM SELESAI')) {
+         statusBadge = `<span class="pill pa">⚠️ ${d.status}</span>`;
+      } else if (stat.includes('SELESAI')) {
+         statusBadge = `<span class="pill pg">✅ ${d.status}</span>`;
+      } else {
+         statusBadge = `<span class="pill pr">🔴 ${d.status}</span>`;
+      }
+
+      const rpSisa = Number(d.sisaKontrak).toLocaleString('id-ID');
+      
+      // Mencegah error kutip tunggal saat diklik
+      const safeSatker = (d.satker || '-').replace(/'/g, "\\'");
+      const safeUraian = (d.uraian || '-').replace(/'/g, "\\'");
+      
+      const alertMsg = `DETAIL KONTRAK:\\n\\n🏢 Satker:\\n${safeSatker}\\n\\n📄 Uraian Pekerjaan:\\n${safeUraian}\\n\\n⏱️ Berakhir:\\n${d.tglSelesai || '-'}\\n\\n📌 Status:\\n${d.status || '-'}\\n\\n💰 Sisa Kontrak (Outstanding):\\nRp ${rpSisa}`;
+      
+      return `<tr class="row-clickable" onclick="alert('${alertMsg}')">
+        <td style="font-size:12px; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${d.satker}">${d.satker || '-'}</td>
+        <td style="font-weight:bold; font-size:12px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${d.uraian}">${d.uraian || '-'}</td>
+        <td style="text-align:center;">${statusBadge}</td>
+        <td style="font-size:12px; white-space: nowrap;">${d.tglSelesai || '-'}</td>
+        <td class="tnum" style="color:var(--amber); font-weight:bold; white-space: nowrap;">${fmtJt(d.sisaKontrak || 0)} Jt</td>
+      </tr>`;
+    }).join('');
+  }
+  
+  // Panggil fungsi render kontrak
+  renderKontrak();
 
   let kumulatifArr = [], nonKumulatifArr = [], currentSum = 0;
   
