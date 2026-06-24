@@ -275,9 +275,9 @@ tbody tr:hover{background:#F4FAF9}
       <div style="display:flex; gap:12px; align-items:center;">
         <select id="fStatus" style="padding:6px;border-radius:4px;border:1px solid #ccc;font-size:13px;font-weight:bold;">
           <option value="all">Semua Status</option>
-          <option value="baik">✅ Baik (≥35%)</option>
-          <option value="perhatian">⚠️ Perhatian (25–34%)</option>
-          <option value="rendah">🔴 Rendah (&lt;25%)</option>
+          <option value="baik">✅ Baik (≥55%)</option>
+          <option value="perhatian">⚠️ Perhatian (35–55%)</option>
+          <option value="rendah">🔴 Rendah (&lt;35%)</option>
         </select>
         <button class="btn-download" onclick="downloadCard(this, 'Tabel_Satker')" title="Unduh Kartu" data-html2canvas-ignore="true">📥</button>
       </div>
@@ -300,7 +300,7 @@ tbody tr:hover{background:#F4FAF9}
     </div>
     <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
       * Deviasi = Realisasi Aktual dikurangi Target RPD. (Minus = Capaian di bawah Rencana)<br>
-      * Parameter Status: ✅ <strong>Baik</strong> (≥35%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (25–34%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;25%)
+      * Parameter Status: ✅ <strong>Baik</strong> (≥55%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (35–55%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;35%)
     </p>
   </div>
 
@@ -322,10 +322,11 @@ const fmtM = v => (Number(v)/1e9).toFixed(2);
 const fmtJt = v => Math.round(Number(v)/1e6).toLocaleString('id-ID');
 const pct = (r,p) => Number(p)>0 ? +(Number(r)/Number(p)*100).toFixed(2) : 0;
 
-function colForPct(p){ return p>=35?'#007A75':p>=25?'#D97706':'#B91C1C'; }
+// Diubah sesuai parameter baru
+function colForPct(p){ return p>=55?'#007A75':p>=35?'#D97706':'#B91C1C'; }
 function badgePct(p){
-  if(p>=35) return '<span class="pill pg">✅ Baik</span>';
-  if(p>=25) return '<span class="pill pa">⚠️ Perhatian</span>';
+  if(p>=55) return '<span class="pill pg">✅ Baik</span>';
+  if(p>=35) return '<span class="pill pa">⚠️ Perhatian</span>';
   return '<span class="pill pr">🔴 Rendah</span>';
 }
 
@@ -731,8 +732,9 @@ function initDashboard() {
       return {...d, pg, blk, rl, rpd, dev, pct: pct(rl, pg)};
     });
 
+    // Filter diperbarui berdasarkan parameter baru
     if(fv !== 'all') {
-      data = data.filter(d => (fv==='baik' && d.pct>=35) || (fv==='perhatian' && d.pct>=25 && d.pct<35) || (fv==='rendah' && d.pct<25));
+      data = data.filter(d => (fv==='baik' && d.pct>=55) || (fv==='perhatian' && d.pct>=35 && d.pct<55) || (fv==='rendah' && d.pct<35));
     }
     
     data.sort((a,b) => b.pct - a.pct);
