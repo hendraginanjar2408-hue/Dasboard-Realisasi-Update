@@ -41,13 +41,13 @@ th, .mc-label, .mc-val, .ct, .prog-name, .tb-org { font-weight: bold; }
 .hero-meta{display:flex;gap:1.25rem;flex-wrap:wrap}
 .hero-meta span{font-size:13px;opacity:.9;display:flex;align-items:center;gap:5px}
 
-/* METRICS (Diubah ke 6 Kolom untuk Outstanding Kontrak) */
+/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:1.5rem}
 .mc{background:var(--white);border-radius:var(--r);border:1px solid var(--border);padding:1.1rem 1rem;position:relative;overflow:hidden}
 .mc::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
 .mc-tq::after{background:var(--tq)} .mc-gr::after{background:var(--gr)} .mc-am::after{background:var(--amber)} .mc-rd::after{background:var(--red)} 
 .mc-bl::after{background:#2563EB} 
-.mc-prp::after{background:#7C3AED} /* Warna Ungu untuk Outstanding Kontrak */
+.mc-prp::after{background:#7C3AED} 
 
 .mc-label{font-size:11px;color:var(--gray-700);text-transform:uppercase;margin-bottom:6px}
 .mc-val{font-size:19px;font-family:var(--mono);line-height:1.2}
@@ -206,9 +206,9 @@ tbody tr:hover{background:#F4FAF9}
         <thead><tr>
           <th>Unit Kerja</th>
           <th>Sumber Dana</th>
-          <th class="tr">Pagu (M)</th>
-          <th class="tr">Realisasi (M)</th>
-          <th class="tr">Out. Kontrak (M)</th>
+          <th class="tr">Pagu (Juta)</th>
+          <th class="tr">Realisasi (Juta)</th>
+          <th class="tr">Out. Kontrak (Juta)</th>
           <th class="tr">% Serapan</th>
         </tr></thead>
         <tbody id="tBodyKPDetail"></tbody>
@@ -225,9 +225,9 @@ tbody tr:hover{background:#F4FAF9}
       <table>
         <thead><tr>
           <th>Nama Tim Kerja</th>
-          <th class="tr">Pagu (M)</th>
-          <th class="tr">Realisasi (M)</th>
-          <th class="tr">Out. Kontrak (M)</th>
+          <th class="tr">Pagu (Juta)</th>
+          <th class="tr">Realisasi (Juta)</th>
+          <th class="tr">Out. Kontrak (Juta)</th>
           <th class="tr">% Serapan</th>
         </tr></thead>
         <tbody id="tBodyTimKerja"></tbody>
@@ -322,7 +322,6 @@ const fmtM = v => (Number(v)/1e9).toFixed(2);
 const fmtJt = v => Math.round(Number(v)/1e6).toLocaleString('id-ID');
 const pct = (r,p) => Number(p)>0 ? +(Number(r)/Number(p)*100).toFixed(2) : 0;
 
-// Diubah sesuai parameter baru
 function colForPct(p){ return p>=55?'#007A75':p>=35?'#D97706':'#B91C1C'; }
 function badgePct(p){
   if(p>=55) return '<span class="pill pg">✅ Baik</span>';
@@ -423,7 +422,7 @@ function initDashboard() {
     <span>Sumber: ADK My Intress Kemenkeu</span>
   `;
 
-  // MENAMPILKAN 6 KOTAK METRIK (TERMASUK OUTSTANDING KONTRAK BARU)
+  // MENAMPILKAN 6 KOTAK METRIK
   document.getElementById('metricsRow').innerHTML=`
     <div class="mc mc-tq">
       <div class="mc-label">Total Pagu DIPA</div>
@@ -532,21 +531,23 @@ function initDashboard() {
         const ok = Number(d.ok)||0;
         const pc = pct(rl, pg);
         
+        // MENGGUNAKAN fmtJt UNTUK TABEL DETAIL KANTOR PUSAT
         htmlKPDetail += `<tr>
           <td>${d.unit_kerja||'-'}</td>
           <td>${d.sumber_dana||'-'}</td>
-          <td class="tnum">${fmtM(pg)}</td>
-          <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtM(rl)}</td>
-          <td class="tnum" style="color:var(--amber)">${fmtM(ok)}</td>
+          <td class="tnum">${fmtJt(pg)}</td>
+          <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(rl)}</td>
+          <td class="tnum" style="color:var(--amber)">${fmtJt(ok)}</td>
           <td class="tpct" style="color:${colForPct(pc)}">${pc.toFixed(2)}%</td>
         </tr>`;
       });
       
+      // MENGGUNAKAN fmtJt UNTUK TOTAL DETAIL KANTOR PUSAT
       htmlKPDetail += `<tr style="background: var(--tq-pale); border-bottom: 2px solid var(--tq-light);">
         <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase; font-weight:bold;">↳ TOTAL SUB-UNIT: ${group.unitName}</td>
-        <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subPagu)}</td>
-        <td class="tnum" style="color:var(--gr-dark); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subReal)}</td>
-        <td class="tnum" style="color:var(--amber); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtM(group.subOk)}</td>
+        <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtJt(group.subPagu)}</td>
+        <td class="tnum" style="color:var(--gr-dark); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtJt(group.subReal)}</td>
+        <td class="tnum" style="color:var(--amber); border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtJt(group.subOk)}</td>
         <td class="tpct" style="color:${colForPct(group.subPct)}; border-top: 1px solid var(--tq-light); font-weight: bold;">${group.subPct.toFixed(2)}%</td>
       </tr>`;
     });
@@ -564,11 +565,12 @@ function initDashboard() {
 
     document.getElementById('tBodyTimKerja').innerHTML = sortedTimKerjaData.map(d => {
       let pg = Number(d.pagu)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
+      // MENGGUNAKAN fmtJt UNTUK TABEL TIM KERJA
       return `<tr>
         <td>${d.nama||'-'}</td>
-        <td class="tnum" style="background:#F4FAF9;">${fmtM(pg)}</td>
-        <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtM(rl)}</td>
-        <td class="tnum" style="color:var(--amber)">${fmtM(ok)}</td>
+        <td class="tnum" style="background:#F4FAF9;">${fmtJt(pg)}</td>
+        <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(rl)}</td>
+        <td class="tnum" style="color:var(--amber)">${fmtJt(ok)}</td>
         <td class="tpct" style="color:${colForPct(pcUtuh)}">${pcUtuh.toFixed(2)}%</td>
       </tr>`;
     }).join('');
@@ -576,7 +578,6 @@ function initDashboard() {
     document.getElementById('tBodyTimKerja').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;font-weight:normal;">Belum ada data Tim Kerja.</td></tr>';
   }
 
-  // FUNGSI UNTUK MENAMPILKAN TABEL KONTRAK (SUDAH URUT TERBESAR)
   function renderKontrakTabel() {
     const tbody = document.getElementById('tBodyKontrak');
     if (!kontrakData || kontrakData.length === 0) {
@@ -612,7 +613,6 @@ function initDashboard() {
     }).join('');
   }
 
-  // Panggil eksekusi pengisian data tabel kontrak
   renderKontrakTabel();
 
   let kumulatifArr = [], nonKumulatifArr = [], currentSum = 0;
@@ -732,7 +732,6 @@ function initDashboard() {
       return {...d, pg, blk, rl, rpd, dev, pct: pct(rl, pg)};
     });
 
-    // Filter diperbarui berdasarkan parameter baru
     if(fv !== 'all') {
       data = data.filter(d => (fv==='baik' && d.pct>=55) || (fv==='perhatian' && d.pct>=35 && d.pct<55) || (fv==='rendah' && d.pct<35));
     }
