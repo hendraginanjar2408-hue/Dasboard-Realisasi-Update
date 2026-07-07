@@ -292,6 +292,7 @@ tbody tr:hover{background:#F4FAF9}
           <th class="tr">Target RPD (Juta)</th> 
           <th class="tr">Realisasi (Juta)</th>
           <th class="tr">Deviasi (Juta)</th> 
+          <th class="tr">GAP (%)</th> 
           <th class="tr">Serapan</th>
           <th style="text-align:center">Status</th>
         </tr></thead>
@@ -300,6 +301,7 @@ tbody tr:hover{background:#F4FAF9}
     </div>
     <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
       * Deviasi = Realisasi Aktual dikurangi Target RPD. (Minus = Capaian di bawah Rencana)<br>
+      * GAP (%) = Persentase Realisasi dikurangi Persentase Target RPD.<br>
       * Parameter Status: ✅ <strong>Baik</strong> (≥55%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (35–55%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;35%)
     </p>
   </div>
@@ -410,10 +412,8 @@ function initDashboard() {
   const devText = deviasi >= 0 ? '+' + deviasi : deviasi;
   const devColor = deviasi >= 0 ? 'var(--gr-dark)' : 'var(--red)';
 
-  // 1. Urutkan data kontrak berdasarkan sisaKontrak terbesar (descending)
   kontrakData.sort((a, b) => (Number(b.sisaKontrak) || 0) - (Number(a.sisaKontrak) || 0));
 
-  // 2. Hitung total nilai akumulasi outstanding sisa kontrak
   const totalOutstanding = kontrakData.reduce((sum, item) => sum + (Number(item.sisaKontrak) || 0), 0);
 
   document.getElementById('heroMeta').innerHTML = `
@@ -422,7 +422,6 @@ function initDashboard() {
     <span>Sumber: ADK My Intress Kemenkeu</span>
   `;
 
-  // MENAMPILKAN 6 KOTAK METRIK
   document.getElementById('metricsRow').innerHTML=`
     <div class="mc mc-tq">
       <div class="mc-label">Total Pagu DIPA</div>
@@ -531,7 +530,6 @@ function initDashboard() {
         const ok = Number(d.ok)||0;
         const pc = pct(rl, pg);
         
-        // MENGGUNAKAN fmtJt UNTUK TABEL DETAIL KANTOR PUSAT
         htmlKPDetail += `<tr>
           <td>${d.unit_kerja||'-'}</td>
           <td>${d.sumber_dana||'-'}</td>
@@ -542,7 +540,6 @@ function initDashboard() {
         </tr>`;
       });
       
-      // MENGGUNAKAN fmtJt UNTUK TOTAL DETAIL KANTOR PUSAT
       htmlKPDetail += `<tr style="background: var(--tq-pale); border-bottom: 2px solid var(--tq-light);">
         <td colspan="2" style="color: var(--tq-dark); text-transform: uppercase; font-weight:bold;">↳ TOTAL SUB-UNIT: ${group.unitName}</td>
         <td class="tnum" style="border-top: 1px solid var(--tq-light); font-weight: bold;">${fmtJt(group.subPagu)}</td>
@@ -565,7 +562,6 @@ function initDashboard() {
 
     document.getElementById('tBodyTimKerja').innerHTML = sortedTimKerjaData.map(d => {
       let pg = Number(d.pagu)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
-      // MENGGUNAKAN fmtJt UNTUK TABEL TIM KERJA
       return `<tr>
         <td>${d.nama||'-'}</td>
         <td class="tnum" style="background:#F4FAF9;">${fmtJt(pg)}</td>
@@ -729,7 +725,10 @@ function initDashboard() {
     let data = satkerData.map(d => {
       let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, rpd = Number(d.rpd)||0;
       let dev = rl - rpd; 
-      return {...d, pg, blk, rl, rpd, dev, pct: pct(rl, pg)};
+      let pctReal = pct(rl, pg);
+      let pctRpd = pct(rpd, pg);
+      let gapPct = pctReal - pctRpd; // Menghitung GAP % = % Realisasi - % RPD
+      return {...d, pg, blk, rl, rpd, dev, pct: pctReal, gapPct: gapPct};
     });
 
     if(fv !== 'all') {
@@ -739,21 +738,26 @@ function initDashboard() {
     data.sort((a,b) => b.pct - a.pct);
 
     if (data.length === 0) {
-        document.getElementById('tBody').innerHTML = '<tr><td colspan="9" style="text-align:center;color:#999;font-weight:normal;">Tidak ada data Satker.</td></tr>';
+        document.getElementById('tBody').innerHTML = '<tr><td colspan="10" style="text-align:center;color:#999;font-weight:normal;">Tidak ada data Satker.</td></tr>';
         return;
     }
 
     document.getElementById('tBody').innerHTML = data.map((d,i) => {
       let devColor = d.dev >= 0 ? 'var(--gr-dark)' : 'var(--red)';
       let devSign = d.dev >= 0 ? '+' : '';
+      let gapColor = d.gapPct >= 0 ? 'var(--gr-dark)' : 'var(--red)';
+      let gapSign = d.gapPct >= 0 ? '+' : '';
 
       return `<tr>
         <td style="text-align:center;color:#999" class="tnum">${i+1}</td>
         <td>${d.nama||'-'}</td>
         <td class="tnum" style="background:#F4FAF9">${fmtJt(d.pg)}</td>
         <td class="tnum" style="color:var(--red)">${fmtJt(d.blk)}</td>
-        <td class="tnum" style="color:var(--amber)">${fmtJt(d.rpd)}</td> <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(d.rl)}</td>
-        <td class="tnum" style="color:${devColor}; font-weight:bold;">${devSign}${fmtJt(d.dev)}</td> <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
+        <td class="tnum" style="color:var(--amber)">${fmtJt(d.rpd)}</td> 
+        <td class="tnum" style="color:var(--gr-dark); font-weight:bold;">${fmtJt(d.rl)}</td>
+        <td class="tnum" style="color:${devColor}; font-weight:bold;">${devSign}${fmtJt(d.dev)}</td> 
+        <td class="tnum" style="color:${gapColor}; font-weight:bold;">${gapSign}${d.gapPct.toFixed(2)}%</td>
+        <td class="tpct" style="color:${colForPct(d.pct)}">${d.pct.toFixed(2)}%</td>
         <td style="text-align:center">${badgePct(d.pct)}</td>
       </tr>`;
     }).join('');
