@@ -416,6 +416,11 @@ function initDashboard() {
 
   const totalOutstanding = kontrakData.reduce((sum, item) => sum + (Number(item.sisaKontrak) || 0), 0);
 
+  // --- MODIFIKASI DIMULAI DI SINI ---
+  const realPlusOk = CONFIG.totalReal + totalOutstanding;
+  const pctRealOk = pct(realPlusOk, CONFIG.totalPagu);
+  // --- MODIFIKASI BERAKHIR DI SINI ---
+
   document.getElementById('heroMeta').innerHTML = `
     <span>Data per ${CONFIG.tanggalData}</span>
     <span>Revisi DIPA ke-${CONFIG.nomorRevisi}</span>
@@ -432,6 +437,10 @@ function initDashboard() {
       <div class="mc-label">Total Realisasi</div>
       <div class="mc-val">Rp ${fmtM(CONFIG.totalReal)} M</div>
       <div class="mc-sub" style="color:var(--gr-dark)">${pctReal.toFixed(2)}% dari Pagu DIPA</div>
+      <hr style="border: 0; border-top: 1px dashed var(--gr-mid); margin: 8px 0 4px;">
+      <div class="mc-label" style="font-size: 10px;">Real + OK</div>
+      <div class="mc-val" style="font-size: 15px;">Rp ${fmtM(realPlusOk)} M</div>
+      <div class="mc-sub" style="color:var(--gr-dark)">${pctRealOk.toFixed(2)}% dari Pagu DIPA</div>
     </div>
     <div class="mc mc-am">
       <div class="mc-label">Sisa Anggaran</div>
@@ -594,10 +603,10 @@ function initDashboard() {
       }
 
       const rpSisa = Number(d.sisaKontrak || 0).toLocaleString('id-ID');
-      const safeSatker = (d.satker || '-').replace(/'/g, "\\'");
-      const safeUraian = (d.uraian || '-').replace(/'/g, "\\'");
+      const safeSatker = (d.satker || '-').replace(/'/g, "\'");
+      const safeUraian = (d.uraian || '-').replace(/'/g, "\'");
       
-      const alertMsg = `DETAIL PROFIL KONTRAK:\\n\\n🏢 Satker / Unit:\\n${safeSatker}\\n\\n📄 Uraian Pekerjaan:\\n${safeUraian}\\n\\n⏱️ Tanggal Selesai:\\n${d.tglSelesai || '-'}\\n\\n📌 Status Progress:\\n${d.status || '-'}\\n\\n💰 Sisa Nilai Kontrak (Outstanding):\\nRp ${rpSisa}`;
+      const alertMsg = `DETAIL PROFIL KONTRAK:\n\n🏢 Satker / Unit:\n${safeSatker}\n\n📄 Uraian Pekerjaan:\n${safeUraian}\n\n⏱️ Tanggal Selesai:\n${d.tglSelesai || '-'}\n\n📌 Status Progress:\n${d.status || '-'}\n\n💰 Sisa Nilai Kontrak (Outstanding):\nRp ${rpSisa}`;
 
       return `<tr class="row-clickable" onclick="alert('${alertMsg}')">
         <td style="font-size:12px; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${d.satker}">${d.satker || '-'}</td>
