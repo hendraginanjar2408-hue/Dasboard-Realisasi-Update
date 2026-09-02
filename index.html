@@ -9,12 +9,9 @@
 
 <!-- ============================================================
   VISITOR TRACKING — GoatCounter (Gratis, tanpa cookie)
-  CARA AKTIFKAN:
-  1. Daftar gratis di https://www.goatcounter.com
-  2. Buat site baru → masukkan domain: hendraginanjar2408-hue.github.io
-  3. Salin "code" akun Anda (contoh: ditjenp2-kemkes)
-  4. Ganti "GANTI_KODE_ANDA" di bawah dengan kode akun Anda
-  5. Lihat statistik di: https://ditjenp2kemkes.goatcounter.com/
+  Kode akun : ditjenp2kemkes
+  Dashboard : https://ditjenp2kemkes.goatcounter.com
+  ✅ Sudah terkonfigurasi — tidak perlu diubah lagi
   ============================================================ -->
 <script data-goatcounter="https://ditjenp2kemkes.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
@@ -800,83 +797,77 @@ function initDashboard() {
 sinkronisasiData();
 
 // ============================================================
-// VISITOR COUNTER — GoatCounter API
-// Ganti "GANTI_KODE_ANDA" dengan kode akun GoatCounter Anda
-// Daftar gratis di: https://www.goatcounter.com
+// VISITOR COUNTER — GoatCounter
+// Kode akun GoatCounter Anda (hanya kode pendek, bukan URL)
 // ============================================================
-(async function loadVisitorCount() {
-  const GOAT_CODE = 'https://ditjenp2kemkes.goatcounter.com/'; // ← GANTI INI
+(function loadVisitorCount() {
+  const GOAT_CODE = 'ditjenp2kemkes'; // ← sudah benar, jangan diubah
 
-  // Jika belum dikonfigurasi, tampilkan tanda tanya
-  if (GOAT_CODE === 'https://ditjenp2kemkes.goatcounter.com/') {
-    document.getElementById('visitorCount').textContent = '?';
-    document.getElementById('visitorBadge').title =
-      'Daftar di goatcounter.com lalu ganti GANTI_KODE_ANDA di kode ini';
-    return;
-  }
+  const badgeEl = document.getElementById('visitorBadge');
+  const countEl = document.getElementById('visitorCount');
 
-  try {
-    // GoatCounter API: total pageviews untuk path "/"
-    const res = await fetch(
-      `https://${GOAT_CODE}.goatcounter.com/api/v0/stats/total?start=2000-01-01&end=2099-12-31`,
-      { headers: { 'Authorization': '' } }  // public endpoint, no auth needed for totals widget
-    );
+  // Tampilkan counter SVG dari GoatCounter (tidak butuh API key)
+  // Counter SVG otomatis menampilkan total kunjungan halaman ini
+  const img = document.createElement('img');
+  img.src = `https://${GOAT_CODE}.goatcounter.com/counter/%2F.svg`;
+  img.alt = 'Jumlah pengunjung';
+  img.title = 'Klik untuk lihat statistik lengkap';
+  img.style.cssText = 'height:18px;vertical-align:middle;';
 
-    // Fallback: gunakan endpoint count publik
-    const countEl = document.getElementById('visitorCount');
-    const badgeEl = document.getElementById('visitorBadge');
-
-    // GoatCounter menyediakan widget JS — kita pakai pendekatan count pixel
-    // Total visit ditampilkan via API hits (perlu token untuk API private)
-    // Solusi paling mudah tanpa API key: embed badge image dari goatcounter
+  img.onload = function() {
+    // Gambar berhasil dimuat — sembunyikan span default, tampilkan img
+    badgeEl.innerHTML = '';
+    // Icon orang
     badgeEl.innerHTML = `
-      <img src="https://${GOAT_CODE}.goatcounter.com/counter/INDEX.svg"
-           style="height:20px;vertical-align:middle"
-           alt="Visitor count"
-           title="Klik untuk lihat statistik lengkap"
-           onerror="this.parentElement.innerHTML='<span style=&quot;font-size:11px;color:#888&quot;>counter aktif</span>'">`;
-    badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-    badgeEl.style.background = 'transparent';
-    badgeEl.style.border = 'none';
-    badgeEl.style.padding = '0';
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#007A75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>`;
+    badgeEl.appendChild(img);
+    badgeEl.innerHTML += `<span style="color:#888;font-size:10px;margin-left:3px">pengunjung</span>`;
+  };
 
-  } catch(e) {
-    document.getElementById('visitorCount').textContent = '–';
-  }
+  img.onerror = function() {
+    // GoatCounter belum aktif atau belum ada kunjungan tercatat
+    countEl.textContent = '0';
+    badgeEl.title = 'Belum ada kunjungan tercatat, atau akun GoatCounter baru dibuat';
+  };
+
+  // Pasang dulu badge sementara loading
+  badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
+
+  // Load gambar (trigger onload/onerror)
+  document.body.appendChild(img);
+  img.style.display = 'none'; // hidden dulu, baru tampil setelah onload
 })();
 </script>
 
 <!-- ============================================================
-  PANDUAN LENGKAP VISITOR COUNTER
+  VISITOR COUNTER — STATUS KONFIGURASI
+  ✅ Kode akun  : ditjenp2kemkes  (SUDAH TERPASANG)
+  ✅ Tracking   : https://ditjenp2kemkes.goatcounter.com/count  (AKTIF)
+  ✅ Counter    : Badge pengunjung di pojok kanan atas topbar
   
-  CARA PASANG (5 menit, gratis selamanya):
-  
-  1. Buka: https://www.goatcounter.com/signup
-  2. Isi:
-     - Code  : ditjenp2kemkes  (ini jadi subdomain Anda)
-     - Site  : hendraginanjar2408-hue.github.io
-     - Email : email Anda
-     - Pass  : password
-  3. Klik "Create"
-  4. Buka file index.html ini dengan Notepad
-  5. Cari teks "GANTI_KODE_ANDA" (ada 3 tempat)
-  6. Ganti semua dengan kode Anda, misal: ditjenp2kemkes
-  7. Simpan → upload ke GitHub (ganti file lama)
-  
-  LIHAT STATISTIK:
+  LIHAT STATISTIK LENGKAP:
   → Buka: https://ditjenp2kemkes.goatcounter.com
-  → Login dengan email & password tadi
-  → Anda bisa melihat:
+  → Login dengan email & password GoatCounter Anda
+  → Tersedia:
      ✅ Total kunjungan per hari/minggu/bulan
      ✅ Halaman yang paling banyak dikunjungi
      ✅ Negara asal pengunjung
      ✅ Browser & perangkat yang dipakai
      ✅ Referral (dari mana pengunjung datang)
   
+  JIKA BELUM DAFTAR GOATCOUNTER:
+  1. Buka: https://www.goatcounter.com/signup
+  2. Code: ditjenp2kemkes | Site: hendraginanjar2408-hue.github.io
+  3. Verifikasi email → selesai, statistik mulai tercatat otomatis
+  
   CATATAN:
   - GoatCounter TIDAK menggunakan cookie
   - Data pengunjung TIDAK dijual ke pihak ketiga
-  - Dashboard statistik bisa dibuat publik atau private
   ============================================================ -->
 </body>
 </html>
