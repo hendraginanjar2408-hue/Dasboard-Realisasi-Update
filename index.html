@@ -803,13 +803,13 @@ sinkronisasiData();
 // ============================================================
 (async function loadVisitorCount() {
   const GOAT_CODE = 'ditjenp2kemkes';
-  const API_TOKEN = '1yiybh5mfv2tg1wdiyc1qor2l6zgofotfu1caw1r9paffzz7h6f'; // ← ganti dengan token dari Settings
+  const API_TOKEN = '1yiybh5mfv2tg1wdiyc1qor2l6zgofotfu1caw1r9paffzz7h6f'; // ✅ token sudah terpasang
 
   const badgeEl = document.getElementById('visitorBadge');
   const countEl = document.getElementById('visitorCount');
 
   // Jika token belum diisi, tampilkan tanda tanya
-  if (API_TOKEN === '1yiybh5mfv2tg1wdiyc1qor2l6zgofotfu1caw1r9paffzz7h6f') {
+  if (!API_TOKEN || API_TOKEN === 'PASTE_TOKEN_DI_SINI') {
     countEl.textContent = '?';
     badgeEl.title = 'Isi API_TOKEN di kode untuk menampilkan angka pengunjung';
     badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
