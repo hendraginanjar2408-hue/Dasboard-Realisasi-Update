@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
-<!-- GoatCounter Tracking — aktif, jangan diubah -->
+<!-- GoatCounter Tracking — jangan diubah -->
 <script data-goatcounter="https://ditjenp2kemkes.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -792,88 +792,84 @@ function initDashboard() {
 sinkronisasiData();
 
 // ============================================================
-// VISITOR COUNTER — GoatCounter
-// Menggunakan counter SVG resmi dari GoatCounter
-// Path disesuaikan dengan URL GitHub Pages Anda
+// VISITOR COUNTER — GoatCounter API (Real-time & Akurat)
+//
+// CARA DAPAT API TOKEN (1x setup):
+// 1. Login ke https://ditjenp2kemkes.goatcounter.com
+// 2. Klik Settings → API tokens → Create token
+// 3. Beri nama "dashboard", centang permission "Read"
+// 4. Copy token yang muncul (contoh: tok_abc123xyz)
+// 5. Paste di bawah mengganti nilai API_TOKEN
 // ============================================================
-(function loadVisitorCount() {
+(async function loadVisitorCount() {
   const GOAT_CODE = 'ditjenp2kemkes';
-  // Path halaman sesuai URL GitHub Pages (encode slash jadi %2F)
-  // URL: hendraginanjar2408-hue.github.io/Dasboard-Realisasi-Update/
-  // Path GoatCounter: /Dasboard-Realisasi-Update/
-  const PAGE_PATH = '%2FDasboard-Realisasi-Update%2F';
+  const API_TOKEN = '1yiybh5mfv2tg1wdiyc1qor2l6zgofotfu1caw1r9paffzz7h6f'; // ← ganti dengan token dari Settings
 
   const badgeEl = document.getElementById('visitorBadge');
   const countEl = document.getElementById('visitorCount');
 
-  // Gunakan counter SVG GoatCounter — menampilkan angka total kunjungan
-  const imgUrl = `https://${GOAT_CODE}.goatcounter.com/counter/${PAGE_PATH}.svg`;
-
-  const img = new Image();
-  img.src = imgUrl;
-  img.alt = '';
-  img.style.cssText = 'height:16px;vertical-align:middle;display:inline-block;';
-
-  img.onload = function () {
-    // Gambar SVG berhasil dimuat — tampilkan di dalam badge
-    countEl.style.display = 'none';
-    badgeEl.innerHTML = `
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-           stroke="#007A75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>`;
-    badgeEl.appendChild(img);
-    const label = document.createElement('span');
-    label.textContent = 'pengunjung';
-    label.style.cssText = 'color:#888;font-size:10px;margin-left:3px;';
-    badgeEl.appendChild(label);
-    badgeEl.title = 'Klik untuk lihat statistik lengkap';
+  // Jika token belum diisi, tampilkan tanda tanya
+  if (API_TOKEN === '1yiybh5mfv2tg1wdiyc1qor2l6zgofotfu1caw1r9paffzz7h6f') {
+    countEl.textContent = '?';
+    badgeEl.title = 'Isi API_TOKEN di kode untuk menampilkan angka pengunjung';
     badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-  };
+    return;
+  }
 
-  img.onerror = function () {
-    // Jika SVG gagal load — tampilkan angka 1 (kunjungan tercatat di GoatCounter)
-    countEl.textContent = '1+';
-    badgeEl.title = 'Klik untuk lihat statistik di GoatCounter';
+  try {
+    // Fetch total kunjungan dari API GoatCounter
+    const today = new Date().toISOString().split('T')[0];
+    const res = await fetch(
+      `https://${GOAT_CODE}.goatcounter.com/api/v0/stats/total?start=2020-01-01&end=${today}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${API_TOKEN}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (!res.ok) throw new Error('API error: ' + res.status);
+    const data = await res.json();
+
+    // data.total = total seluruh kunjungan
+    const total = data.total ?? data.count ?? 0;
+
+    // Tampilkan angka di badge
+    countEl.textContent = total.toLocaleString('id-ID');
+    badgeEl.title = `Total ${total.toLocaleString('id-ID')} kunjungan — klik untuk statistik lengkap`;
     badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-  };
+
+    // Refresh otomatis setiap 5 menit
+    setTimeout(() => loadVisitorCount(), 5 * 60 * 1000);
+
+  } catch(e) {
+    // Fallback: tampilkan link ke GoatCounter
+    countEl.textContent = '–';
+    badgeEl.title = 'Klik untuk lihat jumlah pengunjung di GoatCounter';
+    badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
+    console.warn('GoatCounter API:', e.message);
+  }
 })();
 </script>
 
 <!-- ============================================================
-  PANDUAN LENGKAP VISITOR COUNTER
+  PANDUAN API TOKEN GOATCOUNTER
   
-  CARA PASANG (5 menit, gratis selamanya):
+  CARA DAPAT TOKEN (sekali saja):
+  1. Buka: https://ditjenp2kemkes.goatcounter.com
+  2. Login → klik Settings (pojok kanan atas)
+  3. Klik tab "API tokens" → klik "Create token"
+  4. Nama token: "dashboard-badge", permission: centang "Read"
+  5. Klik Create → COPY token yang muncul
+  6. Buka file index.html ini dengan Notepad
+  7. Cari: PASTE_TOKEN_DI_SINI
+  8. Ganti dengan token Anda, contoh: tok_AbCdEf123456
+  9. Simpan → upload ke GitHub → badge langsung tampil angka akurat
   
-  1. Buka: https://www.goatcounter.com/signup
-  2. Isi:
-     - Code  : ditjenp2kemkes  (ini jadi subdomain Anda)
-     - Site  : hendraginanjar2408-hue.github.io
-     - Email : email Anda
-     - Pass  : password
-  3. Klik "Create"
-  4. Buka file index.html ini dengan Notepad
-  5. Cari teks "ditjenp2kemkes" — sudah terpasang, tidak perlu diubah
-  6. Ganti semua dengan kode Anda, misal: ditjenp2kemkes
-  7. Simpan → upload ke GitHub (ganti file lama)
-  
-  LIHAT STATISTIK:
-  → Buka: https://ditjenp2kemkes.goatcounter.com
-  → Login dengan email & password tadi
-  → Anda bisa melihat:
-     ✅ Total kunjungan per hari/minggu/bulan
-     ✅ Halaman yang paling banyak dikunjungi
-     ✅ Negara asal pengunjung
-     ✅ Browser & perangkat yang dipakai
-     ✅ Referral (dari mana pengunjung datang)
-  
-  CATATAN:
-  - GoatCounter TIDAK menggunakan cookie
-  - Data pengunjung TIDAK dijual ke pihak ketiga
-  - Dashboard statistik bisa dibuat publik atau private
+  CATATAN KEAMANAN:
+  - Token ini hanya punya akses READ (baca saja), aman dipasang di HTML publik
+  - Token hanya bisa membaca statistik, tidak bisa mengubah data apapun
   ============================================================ -->
 </body>
 </html>
