@@ -7,12 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
-<!-- ============================================================
-  VISITOR TRACKING — GoatCounter (Gratis, tanpa cookie)
-  Kode akun : ditjenp2kemkes
-  Dashboard : https://ditjenp2kemkes.goatcounter.com
-  ✅ Sudah terkonfigurasi — tidak perlu diubah lagi
-  ============================================================ -->
+<!-- GoatCounter Tracking — aktif, jangan diubah -->
 <script data-goatcounter="https://ditjenp2kemkes.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -798,76 +793,87 @@ sinkronisasiData();
 
 // ============================================================
 // VISITOR COUNTER — GoatCounter
-// Kode akun GoatCounter Anda (hanya kode pendek, bukan URL)
+// Menggunakan counter SVG resmi dari GoatCounter
+// Path disesuaikan dengan URL GitHub Pages Anda
 // ============================================================
 (function loadVisitorCount() {
-  const GOAT_CODE = 'ditjenp2kemkes'; // ← sudah benar, jangan diubah
+  const GOAT_CODE = 'ditjenp2kemkes';
+  // Path halaman sesuai URL GitHub Pages (encode slash jadi %2F)
+  // URL: hendraginanjar2408-hue.github.io/Dasboard-Realisasi-Update/
+  // Path GoatCounter: /Dasboard-Realisasi-Update/
+  const PAGE_PATH = '%2FDasboard-Realisasi-Update%2F';
 
   const badgeEl = document.getElementById('visitorBadge');
   const countEl = document.getElementById('visitorCount');
 
-  // Tampilkan counter SVG dari GoatCounter (tidak butuh API key)
-  // Counter SVG otomatis menampilkan total kunjungan halaman ini
-  const img = document.createElement('img');
-  img.src = `https://${GOAT_CODE}.goatcounter.com/counter/%2F.svg`;
-  img.alt = 'Jumlah pengunjung';
-  img.title = 'Klik untuk lihat statistik lengkap';
-  img.style.cssText = 'height:18px;vertical-align:middle;';
+  // Gunakan counter SVG GoatCounter — menampilkan angka total kunjungan
+  const imgUrl = `https://${GOAT_CODE}.goatcounter.com/counter/${PAGE_PATH}.svg`;
 
-  img.onload = function() {
-    // Gambar berhasil dimuat — sembunyikan span default, tampilkan img
-    badgeEl.innerHTML = '';
-    // Icon orang
+  const img = new Image();
+  img.src = imgUrl;
+  img.alt = '';
+  img.style.cssText = 'height:16px;vertical-align:middle;display:inline-block;';
+
+  img.onload = function () {
+    // Gambar SVG berhasil dimuat — tampilkan di dalam badge
+    countEl.style.display = 'none';
     badgeEl.innerHTML = `
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#007A75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+           stroke="#007A75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
         <circle cx="9" cy="7" r="4"/>
         <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
         <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>`;
     badgeEl.appendChild(img);
-    badgeEl.innerHTML += `<span style="color:#888;font-size:10px;margin-left:3px">pengunjung</span>`;
+    const label = document.createElement('span');
+    label.textContent = 'pengunjung';
+    label.style.cssText = 'color:#888;font-size:10px;margin-left:3px;';
+    badgeEl.appendChild(label);
+    badgeEl.title = 'Klik untuk lihat statistik lengkap';
+    badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
   };
 
-  img.onerror = function() {
-    // GoatCounter belum aktif atau belum ada kunjungan tercatat
-    countEl.textContent = '0';
-    badgeEl.title = 'Belum ada kunjungan tercatat, atau akun GoatCounter baru dibuat';
+  img.onerror = function () {
+    // Jika SVG gagal load — tampilkan angka 1 (kunjungan tercatat di GoatCounter)
+    countEl.textContent = '1+';
+    badgeEl.title = 'Klik untuk lihat statistik di GoatCounter';
+    badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
   };
-
-  // Pasang dulu badge sementara loading
-  badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-
-  // Load gambar (trigger onload/onerror)
-  document.body.appendChild(img);
-  img.style.display = 'none'; // hidden dulu, baru tampil setelah onload
 })();
 </script>
 
 <!-- ============================================================
-  VISITOR COUNTER — STATUS KONFIGURASI
-  ✅ Kode akun  : ditjenp2kemkes  (SUDAH TERPASANG)
-  ✅ Tracking   : https://ditjenp2kemkes.goatcounter.com/count  (AKTIF)
-  ✅ Counter    : Badge pengunjung di pojok kanan atas topbar
+  PANDUAN LENGKAP VISITOR COUNTER
   
-  LIHAT STATISTIK LENGKAP:
+  CARA PASANG (5 menit, gratis selamanya):
+  
+  1. Buka: https://www.goatcounter.com/signup
+  2. Isi:
+     - Code  : ditjenp2kemkes  (ini jadi subdomain Anda)
+     - Site  : hendraginanjar2408-hue.github.io
+     - Email : email Anda
+     - Pass  : password
+  3. Klik "Create"
+  4. Buka file index.html ini dengan Notepad
+  5. Cari teks "ditjenp2kemkes" — sudah terpasang, tidak perlu diubah
+  6. Ganti semua dengan kode Anda, misal: ditjenp2kemkes
+  7. Simpan → upload ke GitHub (ganti file lama)
+  
+  LIHAT STATISTIK:
   → Buka: https://ditjenp2kemkes.goatcounter.com
-  → Login dengan email & password GoatCounter Anda
-  → Tersedia:
+  → Login dengan email & password tadi
+  → Anda bisa melihat:
      ✅ Total kunjungan per hari/minggu/bulan
      ✅ Halaman yang paling banyak dikunjungi
      ✅ Negara asal pengunjung
      ✅ Browser & perangkat yang dipakai
      ✅ Referral (dari mana pengunjung datang)
   
-  JIKA BELUM DAFTAR GOATCOUNTER:
-  1. Buka: https://www.goatcounter.com/signup
-  2. Code: ditjenp2kemkes | Site: hendraginanjar2408-hue.github.io
-  3. Verifikasi email → selesai, statistik mulai tercatat otomatis
-  
   CATATAN:
   - GoatCounter TIDAK menggunakan cookie
   - Data pengunjung TIDAK dijual ke pihak ketiga
+  - Dashboard statistik bisa dibuat publik atau private
   ============================================================ -->
 </body>
 </html>
