@@ -791,13 +791,16 @@ function initDashboard() {
 
 sinkronisasiData();
 
-async function loadVisitorCount() {
+// ============================================================
+// VISITOR COUNTER — GoatCounter API (Real-time & Akurat)
+// ============================================================
+(async function loadVisitorCount() {
   const GOAT_CODE = 'ditjenp2kemkes';
   const badgeEl = document.getElementById('visitorBadge');
   const countEl = document.getElementById('visitorCount');
 
   try {
-    // Membaca path spesifik halaman saat ini (menghapus garis miring di akhir agar identik dengan rekaman server GoatCounter)
+    // Membaca path spesifik halaman saat ini
     let currentPath = location.pathname.replace(/\/$/, '');
     if (currentPath === '') currentPath = '/';
     const encodedPath = encodeURIComponent(currentPath);
@@ -823,7 +826,7 @@ async function loadVisitorCount() {
     countEl.textContent = '–';
     badgeEl.title = 'Klik untuk lihat jumlah pengunjung di GoatCounter';
     badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-    console.warn('GoatCounter API:', e.message); // Bisa dicek dengan menekan F12 (Developer Tools) di browser
+    console.warn('GoatCounter API:', e.message); 
   }
 })();
 </script>
