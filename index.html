@@ -14,9 +14,9 @@
   2. Buat site baru → masukkan domain: hendraginanjar2408-hue.github.io
   3. Salin "code" akun Anda (contoh: ditjenp2-kemkes)
   4. Ganti "GANTI_KODE_ANDA" di bawah dengan kode akun Anda
-  5. Lihat statistik di: https://ditjenp2kemkes.goatcounter.com
+  5. Lihat statistik di: https://ditjenp2kemkes.goatcounter.com/
   ============================================================ -->
-<script data-goatcounter="https://GANTI_KODE_ANDA.goatcounter.com/count"
+<script data-goatcounter="https://ditjenp2kemkes.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -135,7 +135,7 @@ tbody tr:hover{background:#F4FAF9}
   </div>
   <div style="display:flex;align-items:center;gap:14px">
     <!-- Badge Pengunjung -->
-    <div id="visitorBadge" style="display:flex;align-items:center;gap:6px;background:#F4FAF9;border:1px solid #D1EAE8;border-radius:999px;padding:4px 12px;font-size:12px;color:#007A75;font-family:'DM Mono',monospace;cursor:pointer;" title="Total pengunjung dashboard ini" onclick="window.open('https://GANTI_KODE_ANDA.goatcounter.com','_blank')">
+    <div id="visitorBadge" style="display:flex;align-items:center;gap:6px;background:#F4FAF9;border:1px solid #D1EAE8;border-radius:999px;padding:4px 12px;font-size:12px;color:#007A75;font-family:'DM Mono',monospace;cursor:pointer;" title="Total pengunjung dashboard ini" onclick="window.open('https://ditjenp2kemkes.goatcounter.com','_blank')">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#007A75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span id="visitorCount">–</span>
       <span style="color:#888;font-size:10px">pengunjung</span>
@@ -805,10 +805,10 @@ sinkronisasiData();
 // Daftar gratis di: https://www.goatcounter.com
 // ============================================================
 (async function loadVisitorCount() {
-  const GOAT_CODE = 'GANTI_KODE_ANDA'; // ← GANTI INI
+  const GOAT_CODE = 'https://ditjenp2kemkes.goatcounter.com/'; // ← GANTI INI
 
   // Jika belum dikonfigurasi, tampilkan tanda tanya
-  if (GOAT_CODE === 'GANTI_KODE_ANDA') {
+  if (GOAT_CODE === 'https://ditjenp2kemkes.goatcounter.com/') {
     document.getElementById('visitorCount').textContent = '?';
     document.getElementById('visitorBadge').title =
       'Daftar di goatcounter.com lalu ganti GANTI_KODE_ANDA di kode ini';
