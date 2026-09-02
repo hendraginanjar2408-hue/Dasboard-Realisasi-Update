@@ -791,36 +791,27 @@ function initDashboard() {
 
 sinkronisasiData();
 
-// ============================================================
-// VISITOR COUNTER — GoatCounter API (Real-time & Akurat)
-//
-// CARA DAPAT API TOKEN (1x setup):
-// 1. Login ke https://ditjenp2kemkes.goatcounter.com
-// 2. Klik Settings → API tokens → Create token
-// 3. Beri nama "dashboard", centang permission "Read"
-// 4. Copy token yang muncul (contoh: tok_abc123xyz)
-// 5. Paste di bawah mengganti nilai API_TOKEN
-// ============================================================
-(async function loadVisitorCount() {
+async function loadVisitorCount() {
   const GOAT_CODE = 'ditjenp2kemkes';
   const badgeEl = document.getElementById('visitorBadge');
   const countEl = document.getElementById('visitorCount');
 
   try {
-    // Menggunakan endpoint counter publik tanpa API token.
-    // URL '//.json' mengambil total kunjungan seluruh situs (perhatikan garis miring gandanya).
-    // Jika ingin menampilkan khusus path dari screenshot, ganti URL menjadi: '/counter/%2FDasboard-Realisasi-Update.json'
-    const res = await fetch(`https://${GOAT_CODE}.goatcounter.com/counter//.json`);
+    // Membaca path spesifik halaman saat ini (menghapus garis miring di akhir agar identik dengan rekaman server GoatCounter)
+    let currentPath = location.pathname.replace(/\/$/, '');
+    if (currentPath === '') currentPath = '/';
+    const encodedPath = encodeURIComponent(currentPath);
+
+    // Fetch khusus ke endpoint statistik publik GoatCounter
+    const res = await fetch(`https://${GOAT_CODE}.goatcounter.com/counter/${encodedPath}.json`);
 
     if (!res.ok) throw new Error('API error: ' + res.status);
     const data = await res.json();
 
-    // GoatCounter mengembalikan data.count dalam bentuk string (contoh: "5" atau "1,200")
-    // Hapus koma dan ubah ke integer agar aman
+    // Membersihkan format teks (contoh: "1,200" menjadi angka 1200)
     let total = parseInt((data.count || '0').replace(/,/g, ''), 10);
     if (isNaN(total)) total = 0;
 
-    // Tampilkan angka akurat di badge
     countEl.textContent = total.toLocaleString('id-ID');
     badgeEl.title = `Total ${total.toLocaleString('id-ID')} kunjungan — klik untuk statistik lengkap`;
     badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
@@ -828,11 +819,13 @@ sinkronisasiData();
     // Refresh otomatis setiap 5 menit
     setTimeout(() => loadVisitorCount(), 5 * 60 * 1000);
 
-} catch(e) {
+  } catch(e) {
     countEl.textContent = '–';
     badgeEl.title = 'Klik untuk lihat jumlah pengunjung di GoatCounter';
     badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-    console.warn('GoatCounter API:', e.message);
+    console.warn('GoatCounter API:', e.message); // Bisa dicek dengan menekan F12 (Developer Tools) di browser
+  }
+})();
   }
 })();
 </script>
