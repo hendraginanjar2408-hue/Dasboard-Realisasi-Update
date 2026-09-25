@@ -767,7 +767,10 @@ function initDashboard() {
     document.getElementById('tBody').innerHTML = data.map((d,i) => {
       let devColor = d.dev >= 0 ? 'var(--gr-dark)' : 'var(--red)';
       let devSign = d.dev >= 0 ? '+' : '';
-      let gapColor = d.gapPct >= 0 ? 'var(--gr-dark)' : 'var(--red)';
+    
+      // LOGIKA BARU: Jika GAP antara -5 dan 5 maka hijau, di luar itu merah
+      let gapColor = (d.gapPct >= -5 && d.gapPct <= 5) ? 'var(--gr-dark)' : 'var(--red)';
+      
       let gapSign = d.gapPct >= 0 ? '+' : '';
 
       return `<tr>
