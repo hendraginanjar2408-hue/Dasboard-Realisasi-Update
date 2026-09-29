@@ -115,8 +115,22 @@ tbody tr:hover{background:#F4FAF9}
 <body>
 
 <div id="loadingOverlay">
-  Indonesia Sehat Ditjen P2 Jaya....<br>
-  <span style="font-size:36px;color:#777;margin-top:10px;font-weight:normal;">Harap tunggu sebentar</span>
+  <style>
+    .ld-spin{width:44px;height:44px;border:4px solid #D1EAE8;border-top:4px solid #007A75;
+      border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .ld-img{width:56px;height:56px;object-fit:contain;margin-bottom:12px;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  </style>
+  <img src="https://kemkes.go.id/app_asset/image_content_download/170608421265b0c77488c048.52529672.png"
+       class="ld-img" alt="Kemenkes" onerror="this.style.display='none'">
+  <div class="ld-spin"></div>
+  <div style="font-size:16px;font-weight:700;color:#007A75;margin-bottom:4px">Memuat Dashboard...</div>
+  <div id="ldStatus" style="font-size:13px;color:#555;margin-bottom:4px">⏳ Menghubungi server data Google...</div>
+  <div style="font-size:11px;color:#aaa;margin-top:8px;text-align:center;max-width:300px">
+    Proses ini biasanya selesai dalam 3–10 detik.<br>
+    Jika terlalu lama, periksa koneksi internet Anda.
+  </div>
 </div>
 
 <nav class="topbar">
@@ -373,49 +387,196 @@ async function downloadCard(button, filename) {
   }
 }
 
-async function sinkronisasiData() {
+// ── Fetch dengan timeout & retry otomatis ──────────────────
+function setLoadingStatus(msg) {
+  const el = document.getElementById('ldStatus');
+  if (el) el.textContent = msg;
+}
+
+async function fetchWithTimeout(url, ms = 12000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
   try {
-    const response = await fetch(SPREADSHEET_API_URL);
-    const textData = await response.text();
-    
-    if (textData.trim().startsWith('<')) {
-      throw new Error("API terblokir. Pastikan Google Apps Script di-deploy dengan akses 'Anyone' (Siapa saja).");
-    }
+    const r = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(t);
+    return r;
+  } catch(e) {
+    clearTimeout(t);
+    throw e;
+  }
+}
 
-    const data = JSON.parse(textData);
-    const configData = data.config || {};
+// Cache lokal di localStorage agar tetap tampil walau GAS sedang cold start
+const CACHE_KEY = 'ditjenp2_dashboard_cache';
+const CACHE_TTL = 30 * 60 * 1000; // 30 menit
 
-    CONFIG = {
-      tanggalData: configData.tanggalData || '-',
-      nomorRevisi: Number(configData.nomorRevisi) || 0,
-      jumlahSatker: Number(configData.jumlahSatker) || 0,
-      totalPagu: Number(configData.totalPagu) || 0,
-      totalBlokir: Number(configData.totalBlokir) || 0,
-      totalReal: Number(configData.totalReal) || 0,
-      targetBulan: Number(configData.targetBulan) || 0,
-      rankingEselon: configData.rankingEselon || '-' 
-    };
-    
-    bulananData = data.bulanan || [];
-    programData = data.program || [];
-    jenisData = data.jenis || [];
-    satkerData = data.satker || [];
-    kewenanganData = data.kewenangan || [];
-    sumberDanaData = data.sumberDana || [];
-    timKerjaData = data.timKerja || [];
-    kpDetailDanaData = data.kpDetailDana || [];
-    kontrakData = data.kontrak || []; 
+function saveCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch(e) {}
+}
 
+function loadCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    if (c && Date.now() - c.ts < CACHE_TTL) return c.data;
+  } catch(e) {}
+  return null;
+}
+
+async function sinkronisasiData() {
+  // 1. Tampilkan cache dulu (jika ada) agar dashboard langsung terlihat
+  const cached = loadCache();
+  if (cached) {
+    setLoadingStatus('📦 Menampilkan data tersimpan...');
+    applyData(cached);
     document.getElementById('loadingOverlay').style.display = 'none';
     initDashboard();
-  } catch (error) {
-    console.error("Gagal sinkronisasi:", error);
-    document.getElementById('loadingOverlay').innerHTML = `
-      <div style="text-align:center; padding: 20px;">
-        <span style='color:red; font-size:20px; font-weight:bold;'>Gagal Memuat Data Dashboard</span><br><br>
-        <span style='color:#444; font-size:14px;'>${error.message}</span>
-      </div>`;
+    // Lanjut refresh data terbaru di background tanpa blokir tampilan
+    refreshBackground();
+    return;
   }
+
+  // 2. Belum ada cache — fetch langsung dengan retry
+  setLoadingStatus('⏳ Menghubungi server data Google...');
+  await fetchDanTampilkan(true);
+}
+
+async function refreshBackground() {
+  try {
+    setLoadingStatus('🔄 Memperbarui data terbaru...');
+    const r = await fetchWithTimeout(SPREADSHEET_API_URL, 15000);
+    const txt = await r.text();
+    if (txt.trim().startsWith('<')) return; // GAS error, skip
+    const data = JSON.parse(txt);
+    saveCache(data);
+    applyData(data);
+    initDashboard();
+    // Tampilkan notifikasi kecil
+    showToast('✅ Data berhasil diperbarui');
+  } catch(e) {
+    console.warn('Background refresh gagal:', e.message);
+  }
+}
+
+async function fetchDanTampilkan(retry = false) {
+  try {
+    setLoadingStatus(retry ? '⏳ Mengambil data (percobaan 1/2)...' : '🔄 Mencoba ulang...');
+    const r = await fetchWithTimeout(SPREADSHEET_API_URL, 12000);
+    const txt = await r.text();
+
+    if (txt.trim().startsWith('<')) {
+      // GAS mengembalikan HTML (error page atau login) — ini masalah deploy
+      throw Object.assign(new Error('GAS_HTML'), { isHtml: true });
+    }
+
+    const data = JSON.parse(txt);
+    saveCache(data);
+    applyData(data);
+    document.getElementById('loadingOverlay').style.display = 'none';
+    initDashboard();
+    showToast('✅ Data berhasil dimuat');
+
+  } catch(err) {
+    if (retry) {
+      // Percobaan ke-2 dengan timeout lebih panjang
+      setLoadingStatus('⚠️ Lambat, mencoba ulang (2/2)...');
+      await new Promise(res => setTimeout(res, 1500));
+      return fetchDanTampilkan(false);
+    }
+    // Kedua percobaan gagal — tampilkan error dengan panduan
+    showError(err);
+  }
+}
+
+function applyData(data) {
+  const cfg = data.config || {};
+  CONFIG = {
+    tanggalData:   cfg.tanggalData   || '-',
+    nomorRevisi:   Number(cfg.nomorRevisi)   || 0,
+    jumlahSatker:  Number(cfg.jumlahSatker)  || 0,
+    totalPagu:     Number(cfg.totalPagu)     || 0,
+    totalBlokir:   Number(cfg.totalBlokir)   || 0,
+    totalReal:     Number(cfg.totalReal)     || 0,
+    targetBulan:   Number(cfg.targetBulan)   || 0,
+    rankingEselon: cfg.rankingEselon || '-'
+  };
+  bulananData    = data.bulanan    || [];
+  programData    = data.program    || [];
+  jenisData      = data.jenis      || [];
+  satkerData     = data.satker     || [];
+  kewenanganData = data.kewenangan || [];
+  sumberDanaData = data.sumberDana || [];
+  timKerjaData   = data.timKerja   || [];
+  kpDetailDanaData = data.kpDetailDana || [];
+  kontrakData    = data.kontrak    || [];
+}
+
+function showError(err) {
+  let penyebab = err.message;
+  let solusi   = '';
+  let langkah  = '';
+
+  if (err.name === 'AbortError') {
+    penyebab = 'Server Google Apps Script tidak merespons dalam 12 detik (timeout).';
+    solusi   = 'Ini biasanya karena cold start — server Google "tidur" jika lama tidak dipakai.';
+    langkah  = 'Klik "Coba Lagi" — biasanya percobaan ke-2 langsung berhasil.';
+  } else if (err.isHtml) {
+    penyebab = 'Google Apps Script mengembalikan halaman HTML bukan data JSON.';
+    solusi   = 'Apps Script belum di-deploy ulang, atau pengaturan akses berubah.';
+    langkah  = `Buka <a href="https://script.google.com" target="_blank" style="color:#007A75">script.google.com</a>
+                → Deploy → Manage deployments → pastikan akses: <strong>Anyone</strong> → Deploy baru.`;
+  } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+    penyebab = 'Tidak dapat terhubung ke internet atau server diblokir.';
+    solusi   = 'Periksa koneksi WiFi/data Anda.';
+    langkah  = 'Klik "Coba Lagi" setelah koneksi pulih.';
+  } else if (err.message.includes('JSON')) {
+    penyebab = 'Data yang diterima tidak valid (bukan format JSON).';
+    solusi   = 'Kemungkinan ada perubahan pada Google Apps Script.';
+  }
+
+  document.getElementById('loadingOverlay').innerHTML = `
+    <div style="text-align:center;padding:24px;max-width:500px;margin:0 auto">
+      <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+      <div style="color:#B91C1C;font-size:17px;font-weight:700;margin-bottom:14px">
+        Gagal Memuat Data Dashboard
+      </div>
+      <div style="background:#FEE2E2;border-radius:10px;padding:14px;text-align:left;margin-bottom:10px;font-size:13px">
+        <strong>Penyebab:</strong> ${penyebab}
+      </div>
+      ${solusi ? `<div style="background:#FEF3C7;border-radius:10px;padding:12px;text-align:left;margin-bottom:10px;font-size:12px;color:#444">
+        💡 <strong>Penjelasan:</strong> ${solusi}
+      </div>` : ''}
+      ${langkah ? `<div style="background:#E0F5F4;border-radius:10px;padding:12px;text-align:left;margin-bottom:16px;font-size:12px;color:#007A75">
+        🔧 <strong>Langkah:</strong> ${langkah}
+      </div>` : ''}
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button onclick="location.reload()"
+          style="background:#007A75;color:#fff;border:none;border-radius:8px;padding:10px 24px;
+          font-size:14px;font-weight:600;cursor:pointer">
+          🔄 Coba Lagi
+        </button>
+        <button onclick="document.getElementById('loadingOverlay').style.display='none'"
+          style="background:#F3F4F6;color:#555;border:none;border-radius:8px;padding:10px 18px;
+          font-size:13px;cursor:pointer">
+          Tampilkan Kosong
+        </button>
+      </div>
+      <div style="font-size:11px;color:#aaa;margin-top:14px">
+        💾 Tidak ada data tersimpan — coba buka kembali setelah koneksi stabil
+      </div>
+    </div>`;
+}
+
+// Toast notifikasi kecil (muncul lalu hilang otomatis)
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:20px;right:20px;background:#007A75;color:#fff;
+    padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;
+    box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .4s;`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 400); }, 3000);
 }
 
 function initDashboard() {
@@ -794,42 +955,27 @@ function initDashboard() {
 
 sinkronisasiData();
 
-// ============================================================
-// VISITOR COUNTER — GoatCounter API (Real-time & Akurat)
-// ============================================================
+// VISITOR COUNTER — GoatCounter (pakai token, anti CORS)
 (async function loadVisitorCount() {
-  const GOAT_CODE = 'ditjenp2kemkes';
-  const badgeEl = document.getElementById('visitorBadge');
-  const countEl = document.getElementById('visitorCount');
-
+  const CODE  = 'ditjenp2kemkes';
+  const TOKEN = '1yiybh5mfv2tg1wdiyc1qor2l6zgofotfu1caw1r9paffzz7h6f';
+  const badge = document.getElementById('visitorBadge');
+  const count = document.getElementById('visitorCount');
+  badge.onclick = () => window.open(`https://${CODE}.goatcounter.com`, '_blank');
   try {
-    // Membaca path spesifik halaman saat ini
-    let currentPath = location.pathname.replace(/\/$/, '');
-    if (currentPath === '') currentPath = '/';
-    const encodedPath = encodeURIComponent(currentPath);
-
-    // Fetch khusus ke endpoint statistik publik GoatCounter
-    const res = await fetch(`https://${GOAT_CODE}.goatcounter.com/counter/${encodedPath}.json`);
-
-    if (!res.ok) throw new Error('API error: ' + res.status);
-    const data = await res.json();
-
-    // Membersihkan format teks (contoh: "1,200" menjadi angka 1200)
-    let total = parseInt((data.count || '0').replace(/,/g, ''), 10);
-    if (isNaN(total)) total = 0;
-
-    countEl.textContent = total.toLocaleString('id-ID');
-    badgeEl.title = `Total ${total.toLocaleString('id-ID')} kunjungan — klik untuk statistik lengkap`;
-    badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-
-    // Refresh otomatis setiap 5 menit
-    setTimeout(() => loadVisitorCount(), 5 * 60 * 1000);
-
+    const today = new Date().toISOString().split('T')[0];
+    const r = await fetchWithTimeout(
+      `https://${CODE}.goatcounter.com/api/v0/stats/total?start=2020-01-01&end=${today}`, 8000
+    );
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const total = j.total ?? 0;
+    count.textContent = total.toLocaleString('id-ID');
+    badge.title = `Total ${total.toLocaleString('id-ID')} kunjungan`;
+    setTimeout(loadVisitorCount, 5 * 60 * 1000);
   } catch(e) {
-    countEl.textContent = '–';
-    badgeEl.title = 'Klik untuk lihat jumlah pengunjung di GoatCounter';
-    badgeEl.onclick = () => window.open(`https://${GOAT_CODE}.goatcounter.com`, '_blank');
-    console.warn('GoatCounter API:', e.message); 
+    count.textContent = '–';
+    console.warn('GoatCounter:', e.message);
   }
 })();
 </script>
