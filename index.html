@@ -324,7 +324,7 @@ tbody tr:hover{background:#F4FAF9}
     <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
       * % Serapan = Realisasi / (Pagu − Blokir). Deviasi = Realisasi − Target RPD. (Minus = Capaian di bawah Rencana)<br>
       * GAP (%) = % Serapan dikurangi % RPD terhadap Pagu Efektif.<br>
-      * Parameter Status (target Oktober 2026 = 90%): ✅ <strong>Baik</strong> (≥90%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (70–90%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;70%)
+      * Parameter Status (target November 2026 = 90%): ✅ <strong>Baik</strong> (≥90%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (70–90%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;70%)
     </p>
   </div>
 
@@ -414,7 +414,7 @@ function applyData(data){
     tanggalData:cfg.tanggalData||'-',nomorRevisi:Number(cfg.nomorRevisi)||0,
     jumlahSatker:Number(cfg.jumlahSatker)||0,totalPagu:Number(cfg.totalPagu)||0,
     totalBlokir:Number(cfg.totalBlokir)||0,totalReal:Number(cfg.totalReal)||0,
-    targetBulan: 90, // Target Oktober 2026 = 90% (dari Pagu - Blokir)
+    targetBulan: 90, // Target November 2026 = 90% (dari Pagu - Blokir)
     rankingEselon:cfg.rankingEselon||'-'
   };
   bulananData=data.bulanan||[];programData=data.program||[];
@@ -568,7 +568,7 @@ function initDashboard() {
       <div class="mc-sub" style="color:#6D28D9; font-weight:bold;">Sisa Nilai Komitmen Pekerjaan</div>
     </div>
     <div class="mc mc-rd">
-      <div class="mc-label">Target Oktober 2026</div>
+      <div class="mc-label">Target November 2026</div>
       <div class="mc-val">${CONFIG.targetBulan.toFixed(2)}%</div>
       <div class="mc-sub" style="color:${devColor};">Deviasi: ${devText}% terhadap target</div>
     </div>
