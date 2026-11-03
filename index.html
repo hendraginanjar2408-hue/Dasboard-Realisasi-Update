@@ -297,9 +297,9 @@ tbody tr:hover{background:#F4FAF9}
       <div style="display:flex; gap:12px; align-items:center;">
         <select id="fStatus" style="padding:6px;border-radius:4px;border:1px solid #ccc;font-size:13px;font-weight:bold;">
           <option value="all">Semua Status</option>
-          <option value="baik">✅ Baik (≥80%)</option>
-          <option value="perhatian">⚠️ Perhatian (55–80%)</option>
-          <option value="rendah">🔴 Rendah (&lt;55%)</option>
+          <option value="baik">✅ Baik (≥90%)</option>
+          <option value="perhatian">⚠️ Perhatian (70–90%)</option>
+          <option value="rendah">🔴 Rendah (&lt;70%)</option>
         </select>
         <button class="btn-download" onclick="downloadCard(this, 'Tabel_Satker')" title="Unduh Kartu" data-html2canvas-ignore="true">📥</button>
       </div>
@@ -322,9 +322,9 @@ tbody tr:hover{background:#F4FAF9}
       </table>
     </div>
     <p style="font-size:12px;color:var(--gray-500);margin-top:10px;font-weight:normal;">
-      * Deviasi = Realisasi Aktual dikurangi Target RPD. (Minus = Capaian di bawah Rencana)<br>
-      * GAP (%) = Persentase Realisasi dikurangi Persentase Target RPD.<br>
-      * Parameter Status: ✅ <strong>Baik</strong> (≥80%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (55–80%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;55%)
+      * % Serapan = Realisasi / (Pagu − Blokir). Deviasi = Realisasi − Target RPD. (Minus = Capaian di bawah Rencana)<br>
+      * GAP (%) = % Serapan dikurangi % RPD terhadap Pagu Efektif.<br>
+      * Parameter Status (target Oktober 2026 = 90%): ✅ <strong>Baik</strong> (≥90%) &nbsp;|&nbsp; ⚠️ <strong>Perhatian</strong> (70–90%) &nbsp;|&nbsp; 🔴 <strong>Rendah</strong> (&lt;70%)
     </p>
   </div>
 
@@ -345,11 +345,16 @@ let kontrakData = [];
 const fmtM = v => (Number(v)/1e9).toFixed(2);
 const fmtJt = v => Math.round(Number(v)/1e6).toLocaleString('id-ID');
 const pct = (r,p) => Number(p)>0 ? +(Number(r)/Number(p)*100).toFixed(2) : 0;
+// % Serapan = Realisasi / (Pagu - Blokir); jika blokir tidak tersedia, fallback ke Pagu
+const pctSerap = (real, pagu, blokir) => {
+  const dasarHitung = Number(pagu) - (Number(blokir)||0);
+  return dasarHitung > 0 ? +(Number(real) / dasarHitung * 100).toFixed(2) : 0;
+};
 
-function colForPct(p){ return p>=80?'#007A75':p>=55?'#D97706':'#B91C1C'; }
+function colForPct(p){ return p>=90?'#007A75':p>=70?'#D97706':'#B91C1C'; }
 function badgePct(p){
-  if(p>=80) return '<span class="pill pg">✅ Baik</span>';
-  if(p>=55) return '<span class="pill pa">⚠️ Perhatian</span>';
+  if(p>=90) return '<span class="pill pg">✅ Baik</span>';
+  if(p>=70) return '<span class="pill pa">⚠️ Perhatian</span>';
   return '<span class="pill pr">🔴 Rendah</span>';
 }
 
@@ -409,7 +414,7 @@ function applyData(data){
     tanggalData:cfg.tanggalData||'-',nomorRevisi:Number(cfg.nomorRevisi)||0,
     jumlahSatker:Number(cfg.jumlahSatker)||0,totalPagu:Number(cfg.totalPagu)||0,
     totalBlokir:Number(cfg.totalBlokir)||0,totalReal:Number(cfg.totalReal)||0,
-    targetBulan: 80, // <-- Dibuat FIX 80% (menggantikan fungsi bawaan API Number(cfg.targetBulan))
+    targetBulan: 90, // Target Oktober 2026 = 90% (dari Pagu - Blokir)
     rankingEselon:cfg.rankingEselon||'-'
   };
   bulananData=data.bulanan||[];programData=data.program||[];
@@ -503,20 +508,33 @@ async function sinkronisasiData(){
 }
 
 function initDashboard() {
-  const pctReal = pct(CONFIG.totalReal, CONFIG.totalPagu);
+  // % Serapan Ditjen = Real / (Pagu - Blokir)
+  const paguEfektif = CONFIG.totalPagu - (CONFIG.totalBlokir || 0);
+  const pctReal = paguEfektif > 0 ? +(CONFIG.totalReal / paguEfektif * 100).toFixed(2) : 0;
   const sisa = CONFIG.totalPagu - CONFIG.totalReal;
   const deviasi = (pctReal - CONFIG.targetBulan).toFixed(2);
   const devText = deviasi >= 0 ? '+' + deviasi : deviasi;
   const devColor = deviasi >= 0 ? 'var(--gr-dark)' : 'var(--red)';
 
+  // Normalisasi satuan sisaKontrak (GAS kadang kirim rupiah, kadang juta)
+  if (kontrakData.length > 0) {
+    const vals = kontrakData.map(d => Number(d.sisaKontrak)||0).filter(v => v > 0);
+    if (vals.length > 0) {
+      const sorted = vals.slice().sort((a,b) => a-b);
+      const median = sorted[Math.floor(sorted.length / 2)];
+      if (median > 0 && median < 1e6) {
+        // Satuan juta — konversi ke rupiah penuh
+        kontrakData = kontrakData.map(d => ({...d, sisaKontrak: (Number(d.sisaKontrak)||0) * 1e6}));
+      }
+    }
+  }
   kontrakData.sort((a, b) => (Number(b.sisaKontrak) || 0) - (Number(a.sisaKontrak) || 0));
 
   const totalOutstanding = kontrakData.reduce((sum, item) => sum + (Number(item.sisaKontrak) || 0), 0);
 
-  // --- MODIFIKASI DIMULAI DI SINI ---
+  // Real + Outstanding Kontrak (keduanya rupiah penuh)
   const realPlusOk = CONFIG.totalReal + totalOutstanding;
-  const pctRealOk = pct(realPlusOk, CONFIG.totalPagu);
-  // --- MODIFIKASI BERAKHIR DI SINI ---
+  const pctRealOk = paguEfektif > 0 ? +(realPlusOk / paguEfektif * 100).toFixed(2) : 0;
 
   document.getElementById('heroMeta').innerHTML = `
     <span>Data per ${CONFIG.tanggalData}</span>
@@ -528,16 +546,16 @@ function initDashboard() {
     <div class="mc mc-tq">
       <div class="mc-label">Total Pagu DIPA</div>
       <div class="mc-val">Rp ${fmtM(CONFIG.totalPagu)} M</div>
-      <div class="mc-sub">Info: Terdapat Blokir Rp ${fmtM(CONFIG.totalBlokir)} M</div>
+      <div class="mc-sub">Pagu Efektif: Rp ${fmtM(paguEfektif)} M (setelah blokir Rp ${fmtM(CONFIG.totalBlokir)} M)</div>
     </div>
     <div class="mc mc-gr">
       <div class="mc-label">Total Realisasi</div>
       <div class="mc-val">Rp ${fmtM(CONFIG.totalReal)} M</div>
-      <div class="mc-sub" style="color:var(--gr-dark)">${pctReal.toFixed(2)}% dari Pagu DIPA</div>
+      <div class="mc-sub" style="color:var(--gr-dark)">${pctReal.toFixed(2)}% dari Pagu Efektif</div>
       <hr style="border: 0; border-top: 1px dashed var(--gr-mid); margin: 8px 0 4px;">
       <div class="mc-label" style="font-size: 10px;">Real + OK</div>
       <div class="mc-val" style="font-size: 15px;">Rp ${fmtM(realPlusOk)} M</div>
-      <div class="mc-sub" style="color:var(--gr-dark)">${pctRealOk.toFixed(2)}% dari Pagu DIPA</div>
+      <div class="mc-sub" style="color:var(--gr-dark)">${pctRealOk.toFixed(2)}% dari Pagu Efektif</div>
     </div>
     <div class="mc mc-am">
       <div class="mc-label">Sisa Anggaran</div>
@@ -550,9 +568,9 @@ function initDashboard() {
       <div class="mc-sub" style="color:#6D28D9; font-weight:bold;">Sisa Nilai Komitmen Pekerjaan</div>
     </div>
     <div class="mc mc-rd">
-      <div class="mc-label">Target Bulan Ini</div>
+      <div class="mc-label">Target Oktober 2026</div>
       <div class="mc-val">${CONFIG.targetBulan.toFixed(2)}%</div>
-      <div class="mc-sub" style="color:${devColor};">Deviasi: ${devText}% (GAP)</div>
+      <div class="mc-sub" style="color:${devColor};">Deviasi: ${devText}% terhadap target</div>
     </div>
     <div class="mc mc-bl">
       <div class="mc-label">Peringkat Eselon I</div>
@@ -611,12 +629,13 @@ function initDashboard() {
     kpDetailDanaData.forEach(d => {
       const unit = d.unit_kerja || 'Tanpa Nama Unit';
       if (!groupsObj[unit]) {
-        groupsObj[unit] = { items: [], subPagu: 0, subReal: 0, subOk: 0 };
+        groupsObj[unit] = { items: [], subPagu: 0, subReal: 0, subOk: 0, subBlokir: 0 };
       }
       groupsObj[unit].items.push(d);
       groupsObj[unit].subPagu += Number(d.pagu) || 0;
       groupsObj[unit].subReal += Number(d.real) || 0;
       groupsObj[unit].subOk += Number(d.ok) || 0;
+      groupsObj[unit].subBlokir += Number(d.blokir) || 0;
     });
     
     const sortedGroupsArr = Object.keys(groupsObj).map(unit => ({
@@ -625,7 +644,8 @@ function initDashboard() {
       subPagu: groupsObj[unit].subPagu,
       subReal: groupsObj[unit].subReal,
       subOk: groupsObj[unit].subOk,
-      subPct: pct(groupsObj[unit].subReal, groupsObj[unit].subPagu)
+      subBlokir: groupsObj[unit].subBlokir,
+      subPct: pctSerap(groupsObj[unit].subReal, groupsObj[unit].subPagu, groupsObj[unit].subBlokir)
     })).sort((a, b) => b.subPct - a.subPct);
     
     let htmlKPDetail = '';
@@ -634,7 +654,8 @@ function initDashboard() {
         const pg = Number(d.pagu)||0;
         const rl = Number(d.real)||0;
         const ok = Number(d.ok)||0;
-        const pc = pct(rl, pg);
+        const blk = Number(d.blokir)||0;
+        const pc = pctSerap(rl, pg, blk);
         
         htmlKPDetail += `<tr>
           <td>${d.unit_kerja||'-'}</td>
@@ -661,13 +682,13 @@ function initDashboard() {
 
   if(timKerjaData.length > 0) {
     const sortedTimKerjaData = [...timKerjaData].sort((a, b) => {
-      let pctA = pct(Number(a.real) || 0, Number(a.pagu) || 0);
-      let pctB = pct(Number(b.real) || 0, Number(b.pagu) || 0);
+      let pctA = pctSerap(Number(a.real)||0, Number(a.pagu)||0, Number(a.blokir)||0);
+      let pctB = pctSerap(Number(b.real)||0, Number(b.pagu)||0, Number(b.blokir)||0);
       return pctB - pctA;
     });
 
     document.getElementById('tBodyTimKerja').innerHTML = sortedTimKerjaData.map(d => {
-      let pg = Number(d.pagu)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, pcUtuh = pct(rl, pg);
+      let pg = Number(d.pagu)||0, rl = Number(d.real)||0, ok = Number(d.ok)||0, blk = Number(d.blokir)||0, pcUtuh = pctSerap(rl, pg, blk);
       return `<tr>
         <td>${d.nama||'-'}</td>
         <td class="tnum" style="background:#F4FAF9;">${fmtJt(pg)}</td>
@@ -763,12 +784,12 @@ function initDashboard() {
   if(satkerData.length > 0) {
     let satkerChartData = satkerData.map(d => ({
       nama: d.nama || 'Tanpa Nama',
-      pct: pct(Number(d.real) || 0, Number(d.pagu) || 0)
+      pct: pctSerap(Number(d.real)||0, Number(d.pagu)||0, Number(d.blokir)||0)
     }));
-    
+
     satkerChartData.push({
       nama: 'DITJEN P2 (TOTAL)',
-      pct: pctReal 
+      pct: pctReal
     });
 
     satkerChartData.sort((a,b) => b.pct - a.pct);
@@ -830,15 +851,18 @@ function initDashboard() {
     
     let data = satkerData.map(d => {
       let pg = Number(d.pagu)||0, blk = Number(d.blokir)||0, rl = Number(d.real)||0, rpd = Number(d.rpd)||0;
-      let dev = rl - rpd; 
-      let pctReal = pct(rl, pg);
-      let pctRpd = pct(rpd, pg);
-      let gapPct = pctReal - pctRpd; // Menghitung GAP % = % Realisasi - % RPD
-      return {...d, pg, blk, rl, rpd, dev, pct: pctReal, gapPct: gapPct};
+      let dev = rl - rpd;
+      // % Serapan = Real / (Pagu - Blokir)
+      let serapan = pctSerap(rl, pg, blk);
+      // % RPD dihitung dari Pagu Efektif juga agar konsisten
+      let paguEfektifSatker = pg - blk;
+      let pctRpd = paguEfektifSatker > 0 ? +(rpd / paguEfektifSatker * 100).toFixed(2) : 0;
+      let gapPct = serapan - pctRpd; // GAP % = % Serapan - % RPD terhadap Pagu Efektif
+      return {...d, pg, blk, rl, rpd, dev, pct: serapan, gapPct: gapPct};
     });
 
     if(fv !== 'all') {
-      data = data.filter(d => (fv==='baik' && d.pct>=80) || (fv==='perhatian' && d.pct>=55 && d.pct<80) || (fv==='rendah' && d.pct<55));
+      data = data.filter(d => (fv==='baik' && d.pct>=90) || (fv==='perhatian' && d.pct>=70 && d.pct<90) || (fv==='rendah' && d.pct<70));
     }
     
     data.sort((a,b) => b.pct - a.pct);
